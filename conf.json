@@ -1,0 +1,174 @@
+{
+  "cmdKey": "-",
+  "settings": {
+    "show_displayname": 1,
+    "show_username": 1
+  },
+  "colorInput": {
+    "command": "#00ff00",
+    "default": ""
+  },
+  "pallete": {
+    "time": "grey39",
+    "self": "bold #ff00ff",
+    "other": "cyan",
+    "head": "#00ffff",
+    "e": "bold red",
+    "o": "bold #00ff00",
+    "i": "bold yellow"
+  },
+  "events": {
+    "preReady": "[bold green]On. Start with -s and -c. Wait for OK notif... [/]", 
+    "format": {
+      "author": "{display_name} ({name})",
+      "timestamp_time": "%H:%M",
+      "timestamp_date": "%d/%m/%y"
+    },
+    "onReady": "[bold #00ff00]OK {user}[/]",
+    "onMessage": "[i]PING by {author} in {channel}[/]",
+    "history_render": {
+      "header": "[head]@{current_guild}(#{current_channel}) |{start_index}-{end_index} / {total}|[/head]",
+      "message_header": "<{index}> {timestamp} {author}",
+      "message_header_reply": "<{index}@{replied_index}> {timestamp} {author}",
+      "attachment": "[#222222]| {attaches}[/]"
+    }
+  },
+  "commands": {
+    "exit": {
+      "aliases": ["exit", "e", "quit", "q"],
+      "logs": {
+        "onExit": "[bold red]/////////// SIGHUP ///////////[/]"
+      }
+    },
+    "changelog": {
+      "aliases": ["changelog"],
+      "logs": {
+        "content": "[purple]\n# Changelog\n    v25.06.17 (yy/mm/dd)\n        - Initial release\n            *i forgot what features i did*\n    \n    v25.06.19 (Major Tweaks and Improvement)\n        - Improved Chat UI\n            a. Different color for user and other people\n            b. Added timestamp\n            c. Auto-clear for every command trigger\n            d. Long message has horizontal bar\n            e. Reply to message is visible\n            f. Display name and User name shows (tweakable)\n            g. Added more colors\n            h. Color change upon command insert, the input I mean\n        - More commands (check -h)\n            a. -d(elete messages)\n            b. -up(load file)\n            c. -de(stage)up(load file)\n            d. -f(or)w(ard) message\n            e. -n(o)t(i)f\n            f. -g(o to)n(o)t(i)f\n        - Misc\n            a. Minor revamp of code structure\n            b. Added notifications for ping (untested)    \n[/]"
+      }
+    },
+    "help": {
+      "aliases": ["h"],
+      "logs": {
+        "content": "[purple]\nHow to Use:\n-changeleg to see changelog\n# Navigation:\n    -s [server]: Pick a server\n    -c [channel]: Pick a channel to Chat (require -s to be triggered)\n    -cf [friend]: Pick a friend to DM\n    -q(uit) or -e(xit): Exit the CLI\n# Typing\n    -r [message no.] [txt]: Reply to message no with txt\n    -d [messages no.]: Delete messages index, accept list (e.g., -d 1 2 3)\n    -up: Uploads a file, check your window list, there will be an explorer pop up, when you're done, it is saved into upload/, and you can send the file via '-r' or 'say' in which it will deletes after each -r or 'say'\n    -deup: Delete all staged file upload\n    -fw [message no.] [friend/member/dm]: Forward message index to somebody\n    \"@\": Typing @ will gives a list of member in current channel to be mentioned\n# Misc\n    -ntf/-notif: Checks notification (within the buffer)\n    -gntf/-gonotif: Go to notification location\n    ->n & -<n: Scroll > (newest) or < (oldest) to n messages\n[/]"
+      }
+    },
+    "server_nav": {
+      "aliases": ["s"],
+      "logs": {
+        "success": "[i]Server: {name}[/i]",
+        "not_exist": "[e]SERVER NOT EXIST: {name}[/e]"
+      }
+    },
+    "channel_nav": {
+      "aliases": ["c"],
+      "logs": {
+        "no_server_selected": "[e]Pick server first via -s[/e]",
+        "success": "[i]Channel: {name}[/i]",
+        "not_exist": "[e]CHANNEL NOT EXIST: {name}[e]",
+        "no_access": "[e]You do not have access to the channel.[/e]"
+      }
+    },
+    "scroll_old": {
+      "aliases": ["<"]
+    },
+    "scroll_new": {
+      "aliases": [">"]
+    },
+    "reply": {
+      "aliases": ["r"],
+      "logs": {
+        "error": "[e]{error_msg}[e], do the index even exist?"
+      }
+    },
+    "delete_msg": {
+      "aliases": ["d"],
+      "logs": {
+        "not_own_message": "[e]Cannot delete other people messages[e]",
+        "invalid_index": "[e]Invalid index: {index}[/e]",
+        "out_of_range": "[e]Out of range: {index}[/e]",
+        "generic_error": "[e]Error deleting message {index_str}: {error_msg}[/e]"
+      }
+    },
+    "forward_msg": {
+      "aliases": ["fw"],
+      "logs": {
+        "usage_error": "[error]-fw <no> <user>",
+        "invalid_msg_num": "[error]Invalid message number[/error]",
+        "user_not_specified": "[error]User not specified[/error]",
+        "no_such_user": "[error]No such user {user_arg}[/error]",
+        "generic_error": "[e]Error forwarding message: {error_msg}[/e]"
+      }
+    },
+    "upload_stage": {
+      "aliases": ["up"],
+      "logs": {
+        "null": "[o]Null.[/o]",
+        "staged": "[o]Staged: {filename}[/o]"
+      }
+    },
+    "deupload_stage": {
+      "aliases": ["deup"],
+      "logs": {
+        "reset": "[o]Upload reset.[/o]"
+      }
+    },
+    "dm_nav": {
+      "aliases": ["cf"],
+      "logs": {
+        "success": "**DM**: {name}",
+        "not_found": "[red]FRIEND NOT FOUND: {name}[/]"
+      }
+    },
+    "notifications": {
+      "aliases": ["ntf", "notif"],
+      "logs": {
+        "no_pings": "[i]No pings.[/i]",
+        "ping_details": "[o]{index}. {author} @ {channel}: {content}[o]"
+      }
+    },
+    "go_to_notification": {
+      "aliases": ["gntf", "gonotif"],
+      "logs": {
+        "bad_index": "[e]Bad index[/e]"
+      }
+    },
+    "message_send": {
+      "logs": {
+        "fail": "[e]FAIL TO SEND MESSAGES: {error_msg}[e]",
+        "no_channel_selected": "[e]Select server & channel first. Use `server and `channel first.[e]"
+      }
+    },
+    "message_react": {
+      "logs": {
+        "moreThanThree": "[e]Usage: -react <message no.> <emoji>[/e]",
+	"invalidIndex": "[e]Invalid message index[/e]",
+	"success": "[o]Reacted with {emoji} to message {idx}.[/o]",
+	"error": "[e]Error reacting: {e}[/e]"
+      }		    
+    },
+    "open_attachment": {
+      "aliases": ["open"],
+      "logs": {
+        "usage": "[e]Usage: {cmdK}open <message no.> [attachment indices][/e]",
+        "invalid_msg_index": "[e]Invalid message index[/e]",
+        "msg_index_out_of_range": "[e]Message index out of range[/e]",
+        "no_attachments": "[i]No attachments in that message.[/i]",
+        "attachment_index_out_of_range": "[e]Attachment index {index} out of range.[/e]",
+        "error_saving": "[e]Error saving attachment: {error_msg}[/e]",
+        "opened_image": "[o]Opened image: {filename} in browser.[/o]",
+        "opened_text": "[o]Opened text file: {filename}.[/o]",
+        "error_opening_file": "[e]Error opening file: {error_msg}[/e]",
+        "no_open_command": "[i]No open command for {filename}.[/i]"
+      }
+    },
+    "config_editor": {
+      "aliases": ["conf"],
+      "logs": {
+        "current_config": "[i]Current configuration:[/i]",
+        "saved": "[o]Configuration saved.[/o]",
+        "error_saving": "[e]Error saving configuration: {error_msg}[/e]",
+        "not_saved": "[i]Configuration not saved.[/i]"
+      }
+    }
+  }
+}
