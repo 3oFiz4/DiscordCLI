@@ -71,7 +71,8 @@ How to Use:
 - [ ] Ability to colorize a text within a message (similar to snippet, reference [Rebane Message Color](https://rebane2001.com/discord-colored-text-generator/)
 - [ ] Improved Chat UI for Blocked/Ignored user, and user that replies to user (marked with lighter background)
 - [ ] Ability to Pin, Bookmark messages
-
+- [ ] Login via Username & Password
+- [ ] Multi-Access to token, not just single
 That's it I think.
 # Changelog
     v25.06.17 (yy/mm/dd)
