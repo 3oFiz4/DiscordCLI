@@ -55,15 +55,15 @@ How to Use:
 - [x] Messages forwarding
 - [x] Delete message
 - [x] Message timestamp
-- [ ] React Message
 - [x] Upload files and images
-- [ ] React to Message
+- [ ] React to Message (buggy)
 - [ ] Ability to change profile picture, bio, banner, and more
-- [ ] Ability to show attached files in a message, and ability to open them up via browser
+- [x] Ability to show attached files in a message
+- [ ] Ability to open attached files via browser (buggy)
 - [ ] Better Notifications and Ping (with notification pop-up), with custom ping sound (might use `playsound` module)
-- [ ] More configurable variables
-- [ ] Ability to add Emoji
-- [ ] Snippet within a message (e.g., typing {myutc} will paste your current time within the message)
+- [x] More configurable variables 
+- [ ] Ability to add Emoji (buggy)
+- [ ] Snippet within a message (e.g., typing {myutc} will paste your current time within the message) (partial)
 - [ ] Ability to Edit message (from an index)
 - [ ] Ability to Copy a message (from an index)
 - [ ] Ability to Join, Leave a server
@@ -98,4 +98,9 @@ That's it I think.
             f. -g(o to)n(o)t(i)f
         - Misc
             a. Minor revamp of code structure
-            b. Added notifications for ping (untested)    
+            b. Added notifications for ping (untested)   
+    v25.06.19.01 (Minor tweaks)
+        - Chat UI
+            a. Attachment is shown
+        - Misc
+            a.  Added `conf.json` to configure the terminal
