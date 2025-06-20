@@ -28,8 +28,8 @@
     "onMessage": "[i]PING by {author} in {channel}[/]",
     "history_render": {
       "header": "[head]@{current_guild}(#{current_channel}) |{start_index}-{end_index} / {total}|[/head]",
-      "message_header": "<{index}> {timestamp} {author}",
-      "message_header_reply": "<{index}@{replied_index}> {timestamp} {author}",
+      "message_header": "<{index} {timestamp} {author}>",
+      "message_header_reply": "<{index}@{replied_index} {timestamp} {author}>",
       "attachment": "[#222222]| {attaches}[/]"
     }
   },
@@ -37,7 +37,7 @@
     "exit": {
       "aliases": ["exit", "e", "quit", "q"],
       "logs": {
-        "onExit": "[bold red]/////////// SIGHUP ///////////[/]"
+        "onExit": "[bold red]/////////// SHUTDOWN ///////////[/]"
       }
     },
     "changelog": {

@@ -47,14 +47,13 @@ How to Use:
     ->n & -<n: Scroll > (newest) or < (oldest) to n messages
 ---
 # Known bugs
-- [ ] The message index as history_render is reversed
 - [ ] -fw command instead of forwarding, request a CAPTCHA Verification
-- [ ] The reply_index of a message should be correspondence to the message number index, and there should be a new index variable that shows index in corresponding to total number, and not total number of messages in a single buffer
 - [ ] The notification sound doesn't ring
-- [ ] (minor) Whenever there's a ping the screen will scroll to the top for no reason
-- [ ] (minor) Whenever the command `s` or `c` is used before the initialization of the account to the API, there is chances that the completer won't appear, until <Space> is entered and the command is re-input
+- (minor) Whenever there's a ping the screen will scroll to the top for no reason
+- (minor) Whenever the command `s` or `c` is used before the initialization of the account to the API, there is chances that the completer won't appear, until <Space> is entered and the command is re-input
 - [ ] There's a bug with how Displayname and Username is being shown at some specific server in which they appear to be invisible
-- [ ] (minor) Instead of requesting user to initializate `token.txt`, it shows an error instead
+- (minor) Instead of requesting user to initializate `token.txt`, it shows an error instead
+- [ ] When `main.py` is triggered as PATH, the program does not work, likely issue in `dc.bat`
 - *encounter a bug? Report to Issues please*
 # Features
 - [x] Replying

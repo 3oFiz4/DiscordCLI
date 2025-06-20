@@ -232,42 +232,73 @@ class DiscordClient(discord.Client):
         global _
         clear()
         total = len(self.history_buffer)
-        # calculate window indices from the end
-        # history_offset counts windows from the end: 0 = last window
-        end_index = total - self.history_offset * window_size
-        start_index = max(0, end_index - window_size)+1
-        window = self.history_buffer[start_index:end_index]
 
-        header = _["events"]["history_render"]["header"].format(current_guild=self.current_guild, current_channel=self.current_channel, start_index=start_index, end_index=end_index, total=total) 
+        # this thing right here is the global 1-indexed positions:
+        # end_index: the 1-indexed position of the last message in this window.
+        # since self.history_buffer is 0-indexed and sorted oldest-first:
+        #    global position = index + 1.
+        # therefore,  buffer slice indexes.
+        end_index = total - self.history_offset * window_size  # 1-indexed upper bound of the window.
+        start_index = max(0, end_index - window_size)            # 0-indexed start of the window.
+        
+        header = _["events"]["history_render"]["header"].format(
+            current_guild=self.current_guild,
+            current_channel=self.current_channel,
+            start_index=start_index + 1,  # converting from 0-index to 1-index.
+            end_index=end_index,
+            total=total
+        )
         console.print(header)
 
-        for index, message in enumerate(window, 1):
-#             if message.author.id in self.blocked_members: # In next update
-#                console.print(f"<{index}> ----- Blocked/Ignored ({self.fmt_author(message.author)})")
-#                continue
+        # iterate in the natural order (oldest first)
+        for global_i in range(start_index, end_index):
+            message = self.history_buffer[global_i]
+            # btw the Global Discord position (1-indexed) is: global_i + 1.
+            # so display "inverted" indexes:
+            #   dateisplay index = total - (global Discord position) + 1.
+            # example, if global position is 1 (oldest) and total = 100, then display index = 100 - 1 + 1 = 100.
+            # now if f global position is 100 (newest), display index = 100 - 100 + 1 = 1.
+            display_index = total - (global_i + 1) + 1  # simplifies to: total - global_i
+
+            # havent tested this out
+            if (hasattr(self, 'blocked_users') and message.author.id in self.blocked_users) or \
+               (hasattr(self, 'ignored_users') and message.author.id in self.ignored_users):
+                status = "Blocked" if (hasattr(self, 'blocked_users') and message.author.id in self.blocked_users) else "Ignored"
+                console.print(f"<{display_index}> --- {status} User: {self.fmt_author(message.author)} (message hidden)")
+                continue
+
             timestamp = f"[time]{self.fmt_time(message.created_at)}[/time]"
             auth_name = self.fmt_author(message.author)
-            author = f"[self]{auth_name}[/self]" if message.author.id==self.user.id else f"[other]{auth_name}[/other]"
-            header_line = _["events"]["history_render"]["message_header"].format(index=index, timestamp=timestamp, author=author)
+            author = f"[self]{auth_name}[/self]" if message.author.id == self.user.id else f"[other]{auth_name}[/other]"
 
-            # If the message is a reply, adjust the header_line with the replied message index.
+            header_line = _["events"]["history_render"]["message_header"].format(
+                index=display_index,
+                timestamp=timestamp,
+                author=author
+            )
+
+            # if the message is a reply, look up the global position and adjust its printed index similarly.
             if message.reference and message.reference.message_id:
-                replied_index = None
-                for i, m in enumerate(self.history_buffer, 1):
+                replied_index = "?"
+                for j, m in enumerate(self.history_buffer):
                     if m.id == message.reference.message_id:
-                        replied_index = i
+                        # compute display index for the reply target:
+                        # global Discord index is j+1, so display is: total - (j+1) + 1 = total - j.
+                        replied_index = total - j
                         break
-                if replied_index is None:
-                    replied_index = "?"
-                header_line = _["events"]["history_render"]["message_header_reply"].format(index=index, replied_index=replied_index, timestamp=timestamp, author=author)
 
-
+                header_line = _["events"]["history_render"]["message_header_reply"].format(
+                    index=display_index,
+                    replied_index=replied_index,
+                    timestamp=timestamp,
+                    author=author
+                )
 
             if "\n" in message.content:
                 console.print(header_line)
-                console.rule()  # horizontal rule before message
+                console.rule()  # horizontal rule before message content
                 console.print(message.content)
-                console.rule()  # horizontal rule after message
+                console.rule()  # horizontal rule after message content
             else:
                 console.print(f"{header_line} {message.content}")
 
@@ -275,7 +306,6 @@ class DiscordClient(discord.Client):
                 attaches = " ".join(f"[{i+1}] {att.filename}" for i, att in enumerate(message.attachments))
                 console.print(_["events"]["history_render"]["attachment"].format(attaches=attaches))
 
-            # show reactions succinctly
             if message.reactions:
                 reacts = " ".join(f"{r.emoji}×{r.count}" for r in message.reactions)
                 console.print(f"     {reacts}")
@@ -524,7 +554,7 @@ async def start_cli(client):
             try:
                 idx = int(parts[0])
                 msg_content = parts[1]
-                target = client.history_buffer[idx-1]
+                target = client.history_buffer[len(client.history_buffer) - idx]
                 if hasattr(client, "upload_staged") and client.upload_staged:
                     F = [discord.File(p) for p in client.upload_staged]
                 else:
