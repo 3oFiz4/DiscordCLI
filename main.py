@@ -22,6 +22,10 @@ import json
 from playsound import playsound
 import threading
 import clipboard
+import emoji
+import re
+import sys
+import argparse
 
 # TODO:
 # 1. Minor Improivement on Chat UI, see fn[display_history, render_history], and mention stuff
@@ -44,11 +48,12 @@ commands_config = _[
 ]  # New variable for easier access to commands configuration
 # CONFIGURATION
 theme = Theme(_["pallete"])
-CONTEXT_WINDOW_SHOW_MESSAGE_TOTAL = 30  # Total messages to show in a single buffer
+CONTEXT_WINDOW_SHOW_MESSAGE_TOTAL = _["events"]["history_render"]["message_total"]  # Total messages to show in a single buffer
 # i promise ill add more configuration here, im just too lazy to add one
 
-console = Console(theme=theme, force_terminal=True, color_system="truecolor")
+console = Console(theme=theme)
 # live_history = Live("", console=console, refresh_per_second=4)
+full_emoji_list = list(emoji.EMOJI_ALIAS_UNICODE_ENGLISH.keys())
 
 # -------------- HELPER FUNC -------------------
 # Clear screen
@@ -177,12 +182,15 @@ class DiscordCompleter(Completer):
                     )
 
         # Emoji Picker (no cmdKey, so stays as is)
-        elif text.startswith(":"):
-            emoji_list = [":smile:", ":heart:", ":thumbsup:", ":laughing:", ":sob:"]
+        if text.startswith(":"):
             prefix = text[1:]
-            for emoji in emoji_list:
-                if emoji[1:].lower().startswith(prefix.lower()):
-                    yield Completion(emoji, start_position=-len(prefix) - 1)
+            for emoji_code in full_emoji_list:
+                # Remove the starting and ending ':' for matching.
+                core_emoji = emoji_code.strip(":")
+                if core_emoji.lower().startswith(prefix.lower()):
+                    char = emoji.emojize(emoji_code, language="alias", variant="emoji_type")
+                    display = f"{char} {emoji_code}"
+                    yield Completion(emoji_code, display=display, start_position=-len(prefix)-1)
 
         # Channel Nav: -c
         channel_nav_prefix = get_cmd_prefix("channel_nav")
@@ -563,6 +571,8 @@ v25.06.21.02 (added few features)
 -e [index] [edit] # Edit a message of index_message with new edit
 "say" # Without (-) will say something in current_channel, also sends a file if -up is triggered before
 "@" # List all mentionable users
+-ct [index] [emoji] # React to message in index_message with emoji, ex: -ct 9 :sob:
+":...:" # Show a list of emoji within ::
 
 # Misc
 -ntf/-notif # Show available notifications while the terminal is online
@@ -634,25 +644,31 @@ v25.06.21.02 (added few features)
             client.history_offset = max(0, client.history_offset - 1)
             await client.refresh_history()
             continue
-        # ISSUE:Not work
-        elif check_command_start(C, "message_react"):
-            prefix_len = get_command_prefix_len(C, "message_react")
-            parts = C[prefix_len:].split(" ", 2)
-            if len(parts) > 3:
-                console.print(commands_config["message_react"]["logs"]["moreThanThree"])
+        
+        # React to Message
+        elif check_command_start(C, "react"):
+            prefix_len = get_command_prefix_len(C, "react")
+            parts = C[prefix_len:].split(" ", 1)  # expecting something like: "react [message_index] [emoji]"
+            # if len(parts) < 10:
+                # console.print(commands_config["react"]["logs"]["moreThanThree"])
+                # continue
             try:
-                idx = int(parts[1])
-            except ValueError:
-                console.print(commands_config["message_react"]["logs"]["invalidIndex"])
-            emoji = parts[2].replace("::", ":")
+                idx = int(parts[0])
+            except ValueError as e:
+                console.print(e)
+                console.print(commands_config["react"]["logs"]["invalidIndex"])
+                continue
+
+            # convert colon emoji text (e.g. ":sob:") into its corresponding Unicode emoji.
+            # if user accidentally types double-colons, normalize it to :..:.
+            emoji_input = parts[1].replace("::", ":")
+            unicode_emoji = emoji.emojize(emoji_input, language='alias')
+            
             try:
-                msg = client.history_buffer[idx - 1]
-                await msg.add_reaction(emoji)
-                console.print(commands_config["message_react"]["logs"]["success"])
+                msg = client.history_buffer[len(client.history_buffer) - idx]
+                await msg.add_reaction(unicode_emoji)
             except Exception as e:
-                console.print(
-                    commands_config["message_react"]["logs"]["error"].format(e=e)
-                )
+                console.print(commands_config["react"]["logs"]["error"].format(e=e))
             await client.refresh_history()
             continue
         # ISSUE: Not work
@@ -766,61 +782,7 @@ v25.06.21.02 (added few features)
         # ISSUE: Not work, not because of bugs, but I wanted to stop it here :). Next day, promise!
         # Configuration Editor command
         elif check_command_start(C, "config_editor", exact=True):
-            console.print("DONT USE ME YET")
-
-            for key, value in current_config.items():
-                if isinstance(value, dict):
-                    console.print(
-                        f"[i]Skipping complex config item: {key} (dictionary).[/i]"
-                    )
-                    new_config[key] = value
-                    continue
-
-                prompt_val = await session.prompt_async(f"{key} [{value}]: ")
-                if prompt_val.strip() == "":
-                    new_config[key] = value
-                else:
-
-                    try:
-                        if isinstance(value, bool):
-                            new_config[key] = prompt_val.lower() in (
-                                "true",
-                                "1",
-                                "yes",
-                                "y",
-                            )
-                        elif isinstance(value, int):
-                            new_config[key] = int(prompt_val)
-                        elif isinstance(value, float):
-                            new_config[key] = float(prompt_val)
-                        else:  # Treat as string for other types
-                            new_config[key] = prompt_val
-                    except ValueError:
-                        console.print(
-                            f"[e]Invalid input for {key}. Keeping original value.[/e]"
-                        )
-                        new_config[key] = value
-
-            confirm = await session.prompt_async("Save Config? (y/n): ")
-            if confirm.lower().startswith("y"):
-                try:
-                    with open(BASE_DIR / "conf.json", "w") as f:
-                        json.dump(new_config, f, indent=4)
-                    client.config = new_config
-                    commands_config = new_config.get("commands", {})
-                    cmdK = new_config.get("cmdKey", "!")  # Default to "!" if not found
-
-                    console.print(commands_config["config_editor"]["logs"]["saved"])
-                except Exception as e:
-                    console.print(
-                        commands_config["config_editor"]["logs"]["error_saving"].format(
-                            error_msg=e
-                        )
-                    )
-            else:
-                console.print(commands_config["config_editor"]["logs"]["not_saved"])
-            continue
-        # Replying
+            console.print('Do not use me yet. I am not finished yet')    
         elif check_command_start(C, "reply"):
             prefix_len = get_command_prefix_len(C, "reply")
             parts = C[prefix_len:].split(
@@ -1156,24 +1118,137 @@ v25.06.21.02 (added few features)
                     commands_config["message_send"]["logs"]["no_channel_selected"]
                 )
 
-
-async def main(token):
+async def main_token(token: str) -> None:
     client = DiscordClient()
     try:
         await asyncio.gather(client.start(token), start_cli(client))
     except ValueError as e:
         console.print(
-            f"[err]ERROR: {e}\nHave you set up your token.txt properly? Ensure that it does not encapsulated within ' or \", we got that covered[/err]"
+            f"[err]ERROR: {e}\nHave you set up your {_["file"]["account"]} properly? "
+            "Ensure it is not surrounded by quotes.[/err]"
         )
 
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Discord self-bot bootstrapper",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "-s", "--select",
+        help=f"Select token from {_["file"]["account"]} by index or Displayname/Username",
+        metavar="INDEX_OR_NAME"
+    )
+
+    # Token mode
+    parser.add_argument(
+        "-t", "--token",
+        help="Login using a raw Discord token",
+        metavar="TOKEN"
+    )
+
+    """
+    A bit of elaboration here. Like a hour ago I was thinking of Log-In via Username and Password, and it do log-in, but it asks for CAPTCHA instead, which got me slightly confused as how to fix it. And therefore, voila.
+    """
+    # # Username / password mode
+    # parser.add_argument(
+    #     "-u", "--username",
+    #     help="Gmail / e-mail username (requires -p)",
+    #     metavar="USERNAME"
+    # )
+    # parser.add_argument(
+    #     "-p", "--password",
+    #     help="Gmail / e-mail password (requires -u)",
+    #     metavar="PASSWORD"
+    # )
+
+    args = parser.parse_args(argv)
+
+    using_token  = args.token is not None
+    # using_creds  = args.username or args.password
+
+    if using_token:
+        parser.error("You can do -t/--token")
+
+    # if using_creds and not (args.username and args.password):
+    #     parser.error("-u/--username and -p/--password must be supplied together.")
+
+    return args
+
+
+def extract_tokens(path: str) -> list[dict]:
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    blocks = re.findall(r"---\s*(.*?)\s*(?=---|$)", content, re.DOTALL)
+    tokens = []
+
+    for block in blocks:
+        token_match = re.search(r"Token:\s*(.+)", block)
+        name_match = re.search(r"Displayname:\s*(.+)", block)
+        user_match = re.search(r"Username:\s*(.+)", block)
+
+        if token_match:
+            tokens.append({
+                "token": token_match.group(1).strip(),
+                "displayname": name_match.group(1).strip() if name_match else "",
+                "username": user_match.group(1).strip() if user_match else "",
+            })
+
+    return tokens
+
+def get_selected_token(index_or_name: str | None) -> str | None:
+    token_file = os.path.join(BASE_DIR, f"{_["file"]["account"]}")
+    tokens = extract_tokens(token_file)
+
+    if not tokens:
+        return None
+
+    if index_or_name is None:
+        return tokens[0]["token"]
+
+    if index_or_name.isdigit():
+        idx = int(index_or_name)
+        if 0 <= idx < len(tokens):
+            return tokens[idx]["token"]
+        return None
+
+    index_or_name = index_or_name.lower()
+    for t in tokens:
+        if index_or_name in (t["displayname"].lower(), t["username"].lower()):
+            return t["token"]
+
+    return None
+
+async def main_token(token: str) -> None:
+    client = DiscordClient()
+    try:
+        await asyncio.gather(client.start(token), start_cli(client))
+    except ValueError as e:
+        console.print(
+            f"[err]ERROR: {e}\nHave you set up your {_["file"]["account"]} properly? "
+            "Ensure it is not surrounded by quotes.[/err]"
+        )
 
 if __name__ == "__main__":
-    try:
-        with open(os.path.join(BASE_DIR, "token.txt"), "r") as f:
-            token = f.read().strip()
-    except:
-        console.print(
-            "[err]token.txt does not exist\nIncase you haven't set them up, you can create a text file called 'token.txt' right beside this file, add your Discord Token, and retry[/]"
-        )
+    cli = parse_args(sys.argv[1:])
+
+    if cli.token:
+        asyncio.run(main_token(cli.token))
+
+    elif cli.select:
+        token = get_selected_token(cli.select)
+        if token:
+            asyncio.run(main_token(token))
+        else:
+            console.print("[err]No token found for that selection.\nEach token starts from 0, 1, and so on.\nThe first token is therefore '-s 0'[/err]")
+            sys.exit(1)
+
     else:
-        asyncio.run(main(token))
+        token = get_selected_token(None)
+        if token:
+            asyncio.run(main_token(token))
+        else:
+            console.print(f"[err]No tokens found in {_["file"]["account"]}[/err]")
+            sys.exit(1)

@@ -4,6 +4,13 @@
     "show_displayname": 1,
     "show_username": 1
   },
+  "folders": {
+    "upload": "upload",
+    "ringtone": "ringtone"
+  },
+  "file": {
+    "account": "token.txt"
+  },
   "colorInput": {
     "command": "#00ff00",
     "default": ""
@@ -27,6 +34,7 @@
     "onReady": "[bold #00ff00]OK {user}[/]",
     "onMessage": "[i]PING by {author} in {channel}[/]",
     "history_render": {
+      "message_total": 30,
       "header": "[head]@{current_guild}(#{current_channel}) |{start_index}-{end_index} / {total}|[/head]",
       "message_header": "<{index} {timestamp} {author}>",
       "message_header_reply": "<{index}@{replied_index} {timestamp} {author}>",
@@ -162,9 +170,10 @@
         "no_channel_selected": "[e]Select server & channel first. Use `server and `channel first.[e]"
       }
     },
-    "message_react": {
+    "react": {
+      "aliases": ["ct"],
       "logs": {
-        "moreThanThree": "[e]Usage: -react <message no.> <emoji>[/e]",
+        "moreThanThree": "[e]Usage: -ct <message no.> <emoji>[/e], ex: -ct 5 :sob:",
 	"invalidIndex": "[e]Invalid message index[/e]",
 	"success": "[o]Reacted with {emoji} to message {idx}.[/o]",
 	"error": "[e]Error reacting: {e}[/e]"
