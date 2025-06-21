@@ -37,7 +37,7 @@ RINGTONE_DIR.mkdir(exist_ok=True)
 with open(f"{BASE_DIR / 'conf.json'}", "r", encoding="utf-8") as f:
     _ = json.load(f)
 
-|cmdK = _["cmdKey"]
+cmdK = _["cmdKey"]
 commands_config = _[
     "commands"
 ]  # New variable for easier access to commands configuration
@@ -312,6 +312,8 @@ class DiscordClient(discord.Client):
         if self.input_session:
             current_input = self.input_session.default_buffer.text
         total = len(self.history_buffer)
+        
+        clear()
 
         # this thing right here is the global 1-indexed positions:
         # end_index: the 1-indexed position of the last message in this window.
@@ -809,7 +811,7 @@ async def start_cli(client):
             for each_ind_str in indices_str:
                 try:
                     idx = int(each_ind_str)
-                    msg = client.history_buffer[idx - 1]
+                    msg = client.history_buffer[len(client.history_buffer) - idx]
                     if msg.author.id != client.user.id:
                         console.print(
                             commands_config["delete_msg"]["logs"]["not_own_message"]
