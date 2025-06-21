@@ -545,6 +545,7 @@ v25.06.21.02 (added few features)
         elif check_command_start(C, "help", exact=True):
             console.print(
                     """
+-changelog   # Changelog
 # Navigation:
 -s [server] # Select a server
 -c [channel] # Select a channel, (-s must be triggered already)

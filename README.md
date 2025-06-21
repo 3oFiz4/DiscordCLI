@@ -24,7 +24,7 @@ I am **not responsible** for any account loss.
 ## 📦 Requirements
 
 ```
-rich prompt_toolkit discord.py asyncio shutil tkinter playsound threading json
+clipboard rich prompt_toolkit discord.py asyncio shutil tkinter playsound threading json
 ````
 
 ---
