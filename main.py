@@ -28,18 +28,19 @@ import threading
 # 3. Add Delete message Command
 # 4. Add forward Command
 
-with open("conf.json", "r", encoding="utf-8") as f:
-    _ = json.load(f)
-cmdK = _["cmdKey"]
-commands_config = _[
-    "commands"
-]  # New variable for easier access to commands configuration
 BASE_DIR = Path(__file__).parent
 UPLOAD_DIR = BASE_DIR / "upload"
 UPLOAD_DIR.mkdir(exist_ok=True)
 RINGTONE_DIR = BASE_DIR / "ringtone"
 RINGTONE_DIR.mkdir(exist_ok=True)
 
+with open(f"{BASE_DIR / 'conf.json'}", "r", encoding="utf-8") as f:
+    _ = json.load(f)
+
+|cmdK = _["cmdKey"]
+commands_config = _[
+    "commands"
+]  # New variable for easier access to commands configuration
 # CONFIGURATION
 theme = Theme(_["pallete"])
 CONTEXT_WINDOW_SHOW_MESSAGE_TOTAL = 30  # Total messages to show in a single buffer
@@ -482,7 +483,40 @@ async def start_cli(client):
             break
         # Changelog
         elif check_command_start(C, "changelog", exact=True):
-            console.print(commands_config["changelog"]["logs"]["content"])
+            console.print("""
+# Changelog
+    v25.06.17 (yy/mm/dd)
+        - Initial release (took 4.5~ hours)
+            a. Working Reply and Sending messages
+            b. Ability to DM or Interact with friends
+            c. Proper Chat UI
+    v25.06.19 (Major Tweaks and Improvement) (took ~9.2 hours)
+        - Improved Chat UI
+            a. Different color for user and other people
+            b. Added timestamp
+            c. Auto-clear for every command trigger
+            d. Long message has horizontal bar
+            e. Reply to message is visible
+            f. Display name and User name shows (tweakable)
+            g. Added more colors
+            h. Color change upon command insert, the input I mean
+        - More commands (check -h)
+            a. -d(elete messages)
+            b. -up(load file)
+            c. -de(stage)up(load file)
+            d. -f(or)w(ard) message
+            e. -n(o)t(i)f
+            f. -g(o to)n(o)t(i)f
+        - Misc
+            a. Minor revamp of code structure
+            b. Added notifications for ping (untested)   
+    v25.06.19.01 (Minor tweaks)
+        - Chat UI
+            a. Attachment is shown
+        - Misc
+            a.  Added `conf.json` to configure the terminal
+    v25.06.21 (Minor bug fixes)
+                          """)
         # Help
         elif check_command_start(C, "help", exact=True):
             console.print(commands_config["help"]["logs"]["content"])

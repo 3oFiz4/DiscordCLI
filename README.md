@@ -47,12 +47,11 @@ How to Use:
     ->n & -<n: Scroll > (newest) or < (oldest) to n messages
 ---
 # Known bugs
+Note: *(minor) are bugs that does not affect the features so much, and doesnt affect the user so much.*
 - (minor) Whenever there's a ping the screen will scroll to the top for no reason
 - (minor) Whenever the command `s` or `c` is used before the initialization of the account to the API, there is chances that the completer won't appear, until <Space> is entered and the command is re-input
-- SOLVED (also delete input_session). Whenever any messages appear or that fn:render_history updates, while typing, the text may be cropped.
 - (minor) There's a bug with how Displayname and Username is being shown at some specific server in which they appear to be invisible
-- (minor) Instead of requesting user to initializate `token.txt`, it shows an error instead
-- [ ] When `main.py` is triggered as PATH, the program does not work, likely issue in `dc.bat`
+
 - *encounter a bug? Report to Issues please*
 # Features
 - [x] Replying
@@ -66,7 +65,7 @@ How to Use:
 - [x] Upload files and images
 - [ ] Different notifications for different channels, user, server
 - [ ] Support hotkeys
-- [ ] React to Message (buggy)
+- [x] React to Messag
 - [ ] Ability to change profile picture, bio, banner, and more
 - [x] Ability to show attached files in a message
 - [ ] Ability to open attached files via browser (buggy)
@@ -115,3 +114,4 @@ That's it I think.
             a. Attachment is shown
         - Misc
             a.  Added `conf.json` to configure the terminal
+    v25.06.21 (Minor bug fixes)
