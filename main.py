@@ -37,7 +37,7 @@ RINGTONE_DIR.mkdir(exist_ok=True)
 with open(f"{BASE_DIR / 'conf.json'}", "r", encoding="utf-8") as f:
     _ = json.load(f)
 
-|cmdK = _["cmdKey"]
+cmdK = _["cmdKey"]
 commands_config = _[
     "commands"
 ]  # New variable for easier access to commands configuration
