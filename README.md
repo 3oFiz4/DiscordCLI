@@ -117,6 +117,7 @@ Now you can run `main.py` from anywhere.
 ### ✔ Done
 
 * Reply, send, delete messages
+* Copy, Pin, Edit messages
 * Chat in servers / DMs
 * Message forwarding
 * Upload + auto-remove file attachments
@@ -144,7 +145,8 @@ Now you can run `main.py` from anywhere.
 ---
 <details>
 <summary><strong>Changelog: </summary>
-    v25.06.17 (yy/mm/dd)
+```
+v25.06.17 (yy/mm/dd)
         - Initial release (took 4.5~ hours)
             a. Working Reply and Sending messages
             b. Ability to DM or Interact with friends
@@ -182,4 +184,5 @@ Now you can run `main.py` from anywhere.
             b. -p(in message)
             c. -d(eny)p(in message)
             d. -e(dit message)
-</details>
+```
+</details>
