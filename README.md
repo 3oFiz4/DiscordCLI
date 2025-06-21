@@ -77,8 +77,12 @@ Now you can run `main.py` from anywhere.
 -up                Upload a file (via Explorer popup)
 -deup              Clear all staged uploads
 -fw [idx] [target]  Forward message to someone
-
-"@" while typing will list mentionable users
+-y [index]           Copy or Yank a message
+-p [index]          Pin a message, if authorized 
+-dp [index]         Unpin a message, if authorized
+-e [index] [edit]   Edit a message of index_message with new edit
+"say"               Without (-) will say something in current_channel, also sends a file if -up is triggered before
+"@"                 List all mentionable users
 ```
 
 </details>
@@ -129,13 +133,9 @@ Now you can run `main.py` from anywhere.
 * ⏳ Open files via browser
 * ⏳ Emoji picker (e.g., `:sob:`)
 * ⏳ Colored text / markdown preview (via `rich` and `lexer`
-* ⏳ Message edit / copy / pin / bookmark
 * ⏳ Snippets like `{myutc}` → current time
 * ⏳ Join/leave server
 * ⏳ Multi-token login
-* ⏳ Edit message
-* ⏳ Copy message
-* ⏳ Pin message
 * ⏳ Bookmark message
 * ⏳ Join & Leave a server
 * ⏳ Color a text (similar to snippet, reference [Rebane Message Color](https://rebane2001.com/discord-colored-text-generator/)
