@@ -21,6 +21,7 @@ import os
 import json
 from playsound import playsound
 import threading
+import clipboard
 
 # TODO:
 # 1. Minor Improivement on Chat UI, see fn[display_history, render_history], and mention stuff
@@ -129,6 +130,21 @@ class DiscordCompleter(Completer):
         # DM / Friend Nav: -cf (and potentially -dm if added as alias)
         dm_nav_aliases = commands_config.get("dm_nav", {}).get("aliases", [])
         dm_nav_prefixes = [f"{cmdK}{alias} " for alias in dm_nav_aliases]
+
+        # Edit Command (e.g., -e)
+        edit_prefix = get_cmd_prefix("edit")
+        if text.startswith(edit_prefix):
+            remaining = text[len(edit_prefix):].lstrip()
+            parts = remaining.split(" ", 1)
+            if parts and parts[0].isdigit():
+                idx = int(parts[0])
+                try:
+                    orig = self.client.history_buffer[len(self.client.history_buffer) - idx].content
+                except Exception:
+                    orig = ""
+                if len(parts) == 1 or parts[1] == "":
+                    yield Completion(orig, start_position=0, display=f"{orig}")
+                    yield Completion("", start_position=0, display="Empty")
 
         matched_dm_prefix_len = 0
         for p in dm_nav_prefixes:
@@ -486,42 +502,73 @@ async def start_cli(client):
         # Changelog
         elif check_command_start(C, "changelog", exact=True):
             console.print("""
-# Changelog
-    v25.06.17 (yy/mm/dd)
-        - Initial release (took 4.5~ hours)
-            a. Working Reply and Sending messages
-            b. Ability to DM or Interact with friends
-            c. Proper Chat UI
-    v25.06.19 (Major Tweaks and Improvement) (took ~9.2 hours)
-        - Improved Chat UI
-            a. Different color for user and other people
-            b. Added timestamp
-            c. Auto-clear for every command trigger
-            d. Long message has horizontal bar
-            e. Reply to message is visible
-            f. Display name and User name shows (tweakable)
-            g. Added more colors
-            h. Color change upon command insert, the input I mean
-        - More commands (check -h)
-            a. -d(elete messages)
-            b. -up(load file)
-            c. -de(stage)up(load file)
-            d. -f(or)w(ard) message
-            e. -n(o)t(i)f
-            f. -g(o to)n(o)t(i)f
-        - Misc
-            a. Minor revamp of code structure
-            b. Added notifications for ping (untested)   
-    v25.06.19.01 (Minor tweaks)
-        - Chat UI
-            a. Attachment is shown
-        - Misc
-            a.  Added `conf.json` to configure the terminal
-    v25.06.21 (Minor bug fixes)
+v25.06.17 (yy/mm/dd)
+    - Initial release (took 4.5~ hours)
+        a. Working Reply and Sending messages
+        b. Ability to DM or Interact with friends
+        c. Proper Chat UI
+v25.06.19 (Major Tweaks and Improvement) (took ~9.2 hours)
+    - Improved Chat UI
+        a. Different color for user and other people
+        b. Added timestamp
+        c. Auto-clear for every command trigger
+        d. Long message has horizontal bar
+        e. Reply to message is visible
+        f. Display name and User name shows (tweakable)
+        g. Added more colors
+        h. Color change upon command insert, the input I mean
+    - More commands (check -h)
+        a. -d(elete messages)
+        b. -up(load file)
+        c. -de(stage)up(load file)
+        d. -f(or)w(ard) message
+        e. -n(o)t(i)f
+        f. -g(o to)n(o)t(i)f
+    - Misc
+        a. Minor revamp of code structure
+        b. Added notifications for ping (untested)   
+v25.06.19.01 (Minor tweaks)
+    - Chat UI
+        a. Attachment is shown
+    - Misc
+        a.  Added `conf.json` to configure the terminal
+v25.06.21 (Minor bug fixes)
+v25.06.21.01 (minor bug fixes)
+v25.06.21.02 (added few features)
+    - More commands
+        a. -y(ank message) # Yank is Copy
+        b. -p(in message)
+        c. -d(eny)p(in message)
+        d. -e(dit message)
                           """)
         # Help
         elif check_command_start(C, "help", exact=True):
-            console.print(commands_config["help"]["logs"]["content"])
+            console.print(
+                    """
+# Navigation:
+-s [server] # Select a server
+-c [channel] # Select a channel, (-s must be triggered already)
+-cf [dm/friend/member_in_any_server] # Select a DM or a friend or anyone in the server
+
+# Typing
+-r [index] [msg] # Reply to selected message_index with a message. Also sends a file if -up is triggered before.
+-d [index...] # Delete message index, can be in a list
+-up # Staged a file for upload (via Explorer Pop-Up)
+-deup # Unstage all file for upload
+-fw [index] [dm/friend/member_in_any_server] # Forward/Send a message of index_message to DM, Friend, or Members
+-y [index] # Copy or Yank a message
+-p [index] # Pin a message, if authorized 
+-dp [index] # Unpin a message, if authorized
+-e [index] [edit] # Edit a message of index_message with new edit
+"say" # Without (-) will say something in current_channel, also sends a file if -up is triggered before
+"@" # List all mentionable users
+
+# Misc
+-ntf/-notif # Show available notifications while the terminal is online
+-gntf / -gonotif # Go to notif, (reuire -ntf/-notif to be triggered already)
+-> OR -< # Scroll to latest OR oldest
+                    """
+                    )
         # Server Navigation
         elif check_command_start(C, "server_nav"):
             prefix_len = get_command_prefix_len(C, "server_nav")
@@ -885,6 +932,125 @@ async def start_cli(client):
                     )
                 )
             await client.refresh_history()
+            continue
+        
+        elif check_command_start(C, "edit"):
+            prefix_len = get_command_prefix_len(C, "edit")
+            parts = C[prefix_len:].split(" ", 1)
+
+            if not parts[0].isdigit():
+                console.print(
+                    commands_config["edit"]["logs"]["error"].format(
+                        error_msg="Invalid message index."
+                    )
+                )
+                await client.refresh_history()
+                continue
+
+            idx = int(parts[0])
+            try:
+                
+                orig = client.history_buffer[len(client.history_buffer) - idx].content
+            except Exception as err:
+                console.print(
+                    commands_config["edit"]["logs"]["error"].format(
+                        error_msg="Message index not found."
+                    )
+                )
+                await client.refresh_history()
+                continue
+
+            
+            if len(parts) == 1 or parts[1].strip() == "":
+
+                new_command = f"{cmdK}edit {idx} {orig}"
+
+                client.input_session.default_buffer.set_document(
+                    Document(new_command, cursor_position=len(new_command)),
+                    bypass_readonly=True,
+                )
+                console.print("Auto-populated edit command with original message text.")
+                continue
+
+            new_text = parts[1]
+            try:
+                target = client.history_buffer[len(client.history_buffer) - idx]
+                await target.edit(content=new_text)
+            except Exception as e:
+                console.print(
+                    commands_config["edit"]["logs"]["error"].format(
+                        error_msg=str(e)
+                    )
+                )
+            await client.refresh_history()
+            continue
+
+        # Copy a message
+        elif check_command_start(C, "copy"):
+            prefix_len = get_command_prefix_len(C, "copy")
+            # copy expects only a message index parameter
+            parts = C[prefix_len:].split()
+            if len(parts) < 1 or not parts[0].isdigit():
+                console.print(
+                    commands_config["copy"]["logs"]["error"].format(
+                        error_msg="Missing or invalid message index."
+                    )
+                )
+                await client.refresh_history()
+                continue
+            idx = int(parts[0])
+            try:
+                target = client.history_buffer[len(client.history_buffer) - idx]
+                clipboard.copy(target.content)
+                await client.refresh_history()
+            except Exception as e:
+                console.print(
+                    commands_config["copy"]["logs"]["error"].format(error_msg=str(e))
+                )
+            continue  # No history refresh needed
+
+        # Pin a message, if authorized
+        elif check_command_start(C, "pin"):
+            prefix_len = get_command_prefix_len(C, "pin")
+            parts = C[prefix_len:].split()
+            if len(parts) < 1 or not parts[0].isdigit():
+                console.print(
+                    commands_config["pin"]["logs"]["error"].format(
+                        error_msg="Missing or invalid message index."
+                    )
+                )
+                await client.refresh_history()
+                continue
+            idx = int(parts[0])
+            try:
+                target = client.history_buffer[len(client.history_buffer) - idx]
+                # Attempt to pin the message
+                await target.pin()
+                await client.refresh_history()
+            except Exception as e:
+                console.print("Inauthorized. Type < or > to refresh")
+            continue
+
+        # Unpin message, if authorized
+        elif check_command_start(C, "unpin"):
+            prefix_len = get_command_prefix_len(C, "unpin")
+            parts = C[prefix_len:].split()
+            if len(parts) < 1 or not parts[0].isdigit():
+                console.print(
+                    commands_config["unpin"]["logs"]["error"].format(
+                        error_msg="Missing or invalid message index."
+                    )
+                )
+                await client.refresh_history()
+                continue
+            idx = int(parts[0])
+            try:
+                target = client.history_buffer[len(client.history_buffer) - idx]
+                # Attempt to unpin the message
+                await target.unpin()
+                await client.refresh_history()
+            except Exception as e:
+                console.print("Inauthorized. Type < or > to refresh")
             continue
 
         # Upload staging

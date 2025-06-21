@@ -80,6 +80,30 @@
         "error": "[e]{error_msg}[e], do the index even exist?"
       }
     },
+    "edit": {
+      "aliases": ["e"],
+      "logs": {
+        "error": "[e]{error_msg}[e], do the index even exist?"
+      }
+    },
+    "copy": {
+      "aliases": ["y"],
+      "logs": {
+        "error": "[e]{error_msg}[e], do the index even exist?"
+      }
+    },
+    "pin": {
+      "aliases": ["p"],
+      "logs": {
+        "error": "[e]{error_msg}[e], do the index even exist?"
+      }
+    },
+    "unpin": {
+      "aliases": ["dp"],
+      "logs": {
+        "error": "[e]{error_msg}[e], do the index even exist?"
+      }
+    },
     "delete_msg": {
       "aliases": ["d"],
       "logs": {

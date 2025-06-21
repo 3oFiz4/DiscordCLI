@@ -176,4 +176,10 @@ Now you can run `main.py` from anywhere.
             a.  Added `conf.json` to configure the terminal
     v25.06.21 (Minor bug fixes)
     v25.06.21.01 (minor bug fixes)
+    v25.06.21.02 (added few features)
+        - More commands
+            a. -y(ank message) # Yank is Copy
+            b. -p(in message)
+            c. -d(eny)p(in message)
+            d. -e(dit message)
 </details>
