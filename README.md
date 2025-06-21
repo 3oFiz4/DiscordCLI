@@ -145,7 +145,7 @@ Now you can run `main.py` from anywhere.
 ---
 <details>
 <summary><strong>Changelog: </summary>
-```
+<pre>
 v25.06.17 (yy/mm/dd)
         - Initial release (took 4.5~ hours)
             a. Working Reply and Sending messages
@@ -184,5 +184,5 @@ v25.06.17 (yy/mm/dd)
             b. -p(in message)
             c. -d(eny)p(in message)
             d. -e(dit message)
-```
+<pre>
 </details>
