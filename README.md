@@ -6,8 +6,10 @@
 
 ## 🖼️ Thumbnail
 ![Banner](https://github.com/user-attachments/assets/e072021d-ab9c-4edd-beb6-d38d19f75b51)
+
 Watch more of the showcase here:
-> https://raw.githubusercontent.com/3oFiz4/DiscordCLI/lv_0_20250624003510.mp4
+https://github.com/3oFiz4/DiscordCLI/blob/main/lv_0_20250624003510.mp4
+
 ---
 
 ## ⚠️ Caution
