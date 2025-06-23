@@ -1,13 +1,13 @@
-![Banner](https://github.com/user-attachments/assets/e072021d-ab9c-4edd-beb6-d38d19f75b51)
-
+![Preview](https://github.com/user-attachments/assets/8067db4a-0f02-457f-b6ef-3897aefdb14f)
 # ⚙️ DiscordCLI
 > A Discord terminal client built in ~4 hours. Functional: message, reply, upload — all from the command line.
 
 ---
 
 ## 🖼️ Thumbnail
-![Preview](https://github.com/user-attachments/assets/8067db4a-0f02-457f-b6ef-3897aefdb14f)
-
+![Banner](https://github.com/user-attachments/assets/e072021d-ab9c-4edd-beb6-d38d19f75b51)
+Watch more of the showcase here:
+> https://raw.githubusercontent.com/3oFiz4/DiscordCLI/lv_0_20250624003510.mp4
 ---
 
 ## ⚠️ Caution
