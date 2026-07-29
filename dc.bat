@@ -1,2 +1,2 @@
 @echo off
-python "%USERPROFILE%\DisCLI\main.py" %*
+"C:\Python314\python.exe" "D:\x\Coding\DiscordCLI\main.py" %*

@@ -14,7 +14,7 @@ class CommandHandler:
     def arguments(self, text, command):
         return self.matcher.arguments(text, command)
 
-    def log(self, command, name, **values):
-        text = self.config.log(command, name)
+    def log(self, command, log_name, **values):
+        text = self.config.log(command, log_name)
         if text:
             self.ui.print(text.format(**values))
