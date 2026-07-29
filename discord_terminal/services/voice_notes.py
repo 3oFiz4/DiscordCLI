@@ -11,12 +11,17 @@ from pathlib import Path
 import discord
 from discord.http import Route
 
+from discord_terminal.services.recorder import VoiceRecorder
+
 
 class VoiceNoteService:
-    def __init__(self, client, voice_dir, recorder):
+    def __init__(self, client, voice_dir, recorder=None):
         self.client = client
         self.voice_dir = voice_dir
-        self.recorder = recorder
+        if recorder and hasattr(recorder, "record"):
+            self.recorder = recorder
+        else:
+            self.recorder = VoiceRecorder(voice_dir, client.ui)
 
     async def send(self, channel, source=""):
         recorded = not source

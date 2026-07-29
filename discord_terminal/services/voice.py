@@ -1,5 +1,6 @@
 import discord
 
+from discord_terminal.services.native_voice import NativeVoiceLoader
 from discord_terminal.services.voice_audio import VoiceAudioBridge
 
 
@@ -8,6 +9,7 @@ class VoiceService:
         self.client = client
         self.voice_client = None
         self.audio = VoiceAudioBridge(client)
+        self.native = NativeVoiceLoader()
 
     def channels(self):
         guild = self.client.current_guild
@@ -37,32 +39,49 @@ class VoiceService:
 
     async def join(self, channel):
         current = self.current()
-        if current:
-            if not hasattr(current, "listen"):
-                await current.disconnect(force=True)
-                self.voice_client = None
-                current = None
+        native_module = self.native.load()
         if current:
             if current.channel.id != channel.id:
                 await current.move_to(channel)
             if not self.audio.active:
-                self.audio.start(current)
+                current_module = (
+                    native_module
+                    if hasattr(current, "listen")
+                    else None
+                )
+                self.audio.start(
+                    current,
+                    current_module,
+                    self.native.diagnostic(),
+                )
             return current
-        try:
-            from discord.ext.native_voice import VoiceClient
-        except ImportError:
-            raise RuntimeError(
-                "Voice channels require discord-native-voice. "
-                "Run: py -3 -m pip install -U discord-native-voice sounddevice"
-            )
-        self.voice_client = await channel.connect(
-            cls=VoiceClient,
-            reconnect=True,
-            self_deaf=False,
-            self_mute=False,
+        voice_class = (
+            native_module.VoiceClient
+            if native_module
+            else discord.VoiceClient
         )
         try:
-            self.audio.start(self.voice_client)
+            self.voice_client = await channel.connect(
+                cls=voice_class,
+                reconnect=True,
+                self_deaf=False,
+                self_mute=False,
+            )
+        except Exception as error:
+            detail = self.native.diagnostic()
+            raise RuntimeError(
+                "{}: {}. Native voice diagnostic: {}".format(
+                    type(error).__name__,
+                    error,
+                    detail,
+                )
+            )
+        try:
+            self.audio.start(
+                self.voice_client,
+                native_module,
+                self.native.diagnostic(),
+            )
         except Exception:
             await self.voice_client.disconnect(force=True)
             self.voice_client = None
@@ -127,4 +146,6 @@ class VoiceService:
         speakers = self.speaking_names()
         if speakers:
             text += " | speaking: {}".format(", ".join(speakers))
+        if not self.audio.receive_enabled:
+            text += " | transmit only"
         return [("class:voice", text)]

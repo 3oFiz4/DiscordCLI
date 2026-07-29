@@ -5,6 +5,8 @@ import threading
 import time
 from collections import deque
 
+import discord
+
 
 class MicrophoneFrames:
     def __init__(self):
@@ -50,6 +52,23 @@ class MicrophoneFrames:
         return frame
 
 
+class MicrophoneSource(discord.AudioSource):
+    def __init__(self, frames):
+        self.frames = frames
+
+    def read(self):
+        try:
+            return next(self.frames)
+        except StopIteration:
+            return b""
+
+    def is_opus(self):
+        return False
+
+    def cleanup(self):
+        self.frames.close()
+
+
 class VoiceAudioBridge:
     def __init__(self, client):
         self.client = client
@@ -63,29 +82,25 @@ class VoiceAudioBridge:
         self.active = False
         self.last_invalidate = 0
         self.speaker_timer = None
+        self.mode = "disconnected"
+        self.receive_enabled = False
+        self.diagnostic = ""
 
-    def start(self, voice_client):
+    def start(self, voice_client, native_module=None, diagnostic=""):
         try:
             import sounddevice
-            from discord.ext.native_voice import AudioFrameSource
-            from discord.ext.native_voice import BasicSink
-            from discord.ext.native_voice import PCMDecodeSink
-        except ImportError:
+        except Exception as error:
             raise RuntimeError(
-                "Voice audio requires discord-native-voice and sounddevice. "
-                "Run: py -3 -m pip install -U discord-native-voice sounddevice"
+                "sounddevice could not start: {}: {}".format(
+                    type(error).__name__,
+                    error,
+                )
             )
         self.stop()
         self.voice_client = voice_client
         self.microphone = MicrophoneFrames()
+        self.diagnostic = diagnostic
         try:
-            self.output_stream = sounddevice.RawOutputStream(
-                samplerate=48000,
-                channels=2,
-                dtype="int16",
-                blocksize=960,
-                callback=self._output,
-            )
             self.input_stream = sounddevice.RawInputStream(
                 samplerate=48000,
                 channels=1,
@@ -93,24 +108,46 @@ class VoiceAudioBridge:
                 blocksize=960,
                 callback=self._input,
             )
-            self.output_stream.start()
             self.input_stream.start()
-            source = AudioFrameSource(self.microphone, opus=False)
-            voice_client.play(
-                source,
-                application="voip",
-                signal_type="voice",
-            )
-            destination = BasicSink(
-                self._receive,
-                media_types=("audio",),
-                codecs=("pcm",),
-            )
-            voice_client.listen(PCMDecodeSink(destination))
+            if native_module:
+                self._start_native(sounddevice, native_module)
+                self.mode = "full-duplex"
+                self.receive_enabled = True
+            else:
+                voice_client.play(MicrophoneSource(self.microphone))
+                self.mode = "transmit-only"
+                self.receive_enabled = False
             self.active = True
         except Exception:
             self.stop()
             raise
+
+    def _start_native(self, sounddevice, native_module):
+        self.output_stream = sounddevice.RawOutputStream(
+            samplerate=48000,
+            channels=2,
+            dtype="int16",
+            blocksize=960,
+            callback=self._output,
+        )
+        self.output_stream.start()
+        source = native_module.AudioFrameSource(
+            self.microphone,
+            opus=False,
+        )
+        self.voice_client.play(
+            source,
+            application="voip",
+            signal_type="voice",
+        )
+        destination = native_module.BasicSink(
+            self._receive,
+            media_types=("audio",),
+            codecs=("pcm",),
+        )
+        self.voice_client.listen(
+            native_module.PCMDecodeSink(destination)
+        )
 
     def stop(self):
         voice_client = self.voice_client
@@ -142,6 +179,8 @@ class VoiceAudioBridge:
         self.microphone = None
         self.voice_client = None
         self.active = False
+        self.mode = "disconnected"
+        self.receive_enabled = False
         with self.lock:
             self.playback.clear()
             self.speakers.clear()
