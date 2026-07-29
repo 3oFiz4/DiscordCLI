@@ -1,26 +1,12 @@
 {
   "cmdKey": "-",
   "settings": {
-    "show_displayname": true,
-    "show_username": true,
-    "role_based_username_color": false,
-    "timezone": "Asia/Makassar",
-    "notification_scan": {
-      "enabled": true,
-      "channel_delay_seconds": 0.75,
-      "max_messages_per_channel": null
-    },
-    "notification_sounds": {
-      "enabled": true,
-      "default": "notification",
-      "dm": "notification",
-      "channels": {}
-    }
+    "show_displayname": 1,
+    "show_username": 1
   },
   "folders": {
     "upload": "upload",
-    "ringtone": "ringtone",
-    "data": "data"
+    "ringtone": "ringtone"
   },
   "file": {
     "account": "token.txt"
@@ -34,29 +20,25 @@
     "self": "bold #ff00ff",
     "other": "cyan",
     "head": "#00ffff",
-    "attachment": "grey23",
-    "reply_to_self": "bold black on bright_yellow",
     "e": "bold red",
     "o": "bold #00ff00",
     "i": "bold yellow"
   },
   "events": {
-    "preReady": "[bold green]On. Start with -s and -c. Wait for OK notif...[/]",
+    "preReady": "[bold green]On. Start with -s and -c. Wait for OK notif... [/]", 
     "format": {
       "author": "{display_name} ({name})",
       "timestamp_time": "%H:%M",
       "timestamp_date": "%d/%m/%y"
     },
     "onReady": "[bold #00ff00]OK {user}[/]",
-    "onMessage": "[i]PING by {author} in {channel}[/i]",
+    "onMessage": "[i]PING by {author} in {channel}[/]",
     "history_render": {
       "message_total": 30,
       "header": "[head]@{current_guild}(#{current_channel}) |{start_index}-{end_index} / {total}|[/head]",
       "message_header": "<{index} {timestamp} {author}>",
       "message_header_reply": "<{index}@{replied_index} {timestamp} {author}>",
-      "message_header_reply_to_self": "[reply_to_self]<{index}@{replied_index} {timestamp} {author} | {indicator}>[/reply_to_self]",
-      "reply_to_self_indicator": "REPLY TO YOU",
-      "attachment": "[attachment]| {attaches}[/attachment]"
+      "attachment": "[#222222]| {attaches}[/]"
     }
   },
   "commands": {
@@ -69,13 +51,13 @@
     "changelog": {
       "aliases": ["changelog"],
       "logs": {
-        "content": "[purple]v26.07.29\n    - Structured OOP package\n    - Chafa iTerm image preview\n    - Reply-to-you indicator\n    - Role-based username color option\n    - Persistent startup notifications\n    - Synchronized local timestamps\n    - Topmost upload picker\n    - Message bookmarks\n    - Per-channel notification sounds[/purple]"
+        "content": "[purple]\n# Changelog\n    v25.06.17 (yy/mm/dd)\n        - Initial release\n            *i forgot what features i did*\n    \n    v25.06.19 (Major Tweaks and Improvement)\n        - Improved Chat UI\n            a. Different color for user and other people\n            b. Added timestamp\n            c. Auto-clear for every command trigger\n            d. Long message has horizontal bar\n            e. Reply to message is visible\n            f. Display name and User name shows (tweakable)\n            g. Added more colors\n            h. Color change upon command insert, the input I mean\n        - More commands (check -h)\n            a. -d(elete messages)\n            b. -up(load file)\n            c. -de(stage)up(load file)\n            d. -f(or)w(ard) message\n            e. -n(o)t(i)f\n            f. -g(o to)n(o)t(i)f\n        - Misc\n            a. Minor revamp of code structure\n            b. Added notifications for ping (untested)    \n[/]"
       }
     },
     "help": {
-      "aliases": ["h", "help"],
+      "aliases": ["h"],
       "logs": {
-        "content": "[purple]Navigation:\n    -s [server]\n    -c [channel]\n    -cf [friend]\n    -< and ->\nMessages:\n    -r [message no.] [text]\n    -e [message no.] [text]\n    -d [message no. ...]\n    -fw [message no.] [friend]\n    -y [message no.]\n    -p [message no.]\n    -dp [message no.]\n    -ct [message no.] [emoji]\nMedia:\n    -up\n    -deup\n    -open [message no.] [attachment no. ...]\n    -v [message no.] [image no.]\nNotifications:\n    -ntf\n    -gntf [notification no.]\nBookmarks:\n    -bm [message no.]\n    -bms\n    -dbm [bookmark no.]\n    -gbm [bookmark no.]\nExit:\n    -q[/purple]"
+        "content": "[purple]\nHow to Use:\n-changeleg to see changelog\n# Navigation:\n    -s [server]: Pick a server\n    -c [channel]: Pick a channel to Chat (require -s to be triggered)\n    -cf [friend]: Pick a friend to DM\n    -q(uit) or -e(xit): Exit the CLI\n# Typing\n    -r [message no.] [txt]: Reply to message no with txt\n    -d [messages no.]: Delete messages index, accept list (e.g., -d 1 2 3)\n    -up: Uploads a file, check your window list, there will be an explorer pop up, when you're done, it is saved into upload/, and you can send the file via '-r' or 'say' in which it will deletes after each -r or 'say'\n    -deup: Delete all staged file upload\n    -fw [message no.] [friend/member/dm]: Forward message index to somebody\n    \"@\": Typing @ will gives a list of member in current channel to be mentioned\n# Misc\n    -ntf/-notif: Checks notification (within the buffer)\n    -gntf/-gonotif: Go to notification location\n    ->n & -<n: Scroll > (newest) or < (oldest) to n messages\n[/]"
       }
     },
     "server_nav": {
@@ -90,7 +72,7 @@
       "logs": {
         "no_server_selected": "[e]Pick server first via -s[/e]",
         "success": "[i]Channel: {name}[/i]",
-        "not_exist": "[e]CHANNEL NOT EXIST: {name}[/e]",
+        "not_exist": "[e]CHANNEL NOT EXIST: {name}[e]",
         "no_access": "[e]You do not have access to the channel.[/e]"
       }
     },
@@ -103,37 +85,37 @@
     "reply": {
       "aliases": ["r"],
       "logs": {
-        "error": "[e]{error_msg}[/e], does the index exist?"
+        "error": "[e]{error_msg}[e], do the index even exist?"
       }
     },
     "edit": {
       "aliases": ["e"],
       "logs": {
-        "error": "[e]{error_msg}[/e], does the index exist?"
+        "error": "[e]{error_msg}[e], do the index even exist?"
       }
     },
     "copy": {
       "aliases": ["y"],
       "logs": {
-        "error": "[e]{error_msg}[/e], does the index exist?"
+        "error": "[e]{error_msg}[e], do the index even exist?"
       }
     },
     "pin": {
       "aliases": ["p"],
       "logs": {
-        "error": "[e]{error_msg}[/e]"
+        "error": "[e]{error_msg}[e], do the index even exist?"
       }
     },
     "unpin": {
       "aliases": ["dp"],
       "logs": {
-        "error": "[e]{error_msg}[/e]"
+        "error": "[e]{error_msg}[e], do the index even exist?"
       }
     },
     "delete_msg": {
       "aliases": ["d"],
       "logs": {
-        "not_own_message": "[e]Cannot delete other people's messages[/e]",
+        "not_own_message": "[e]Cannot delete other people messages[e]",
         "invalid_index": "[e]Invalid index: {index}[/e]",
         "out_of_range": "[e]Out of range: {index}[/e]",
         "generic_error": "[e]Error deleting message {index_str}: {error_msg}[/e]"
@@ -142,10 +124,10 @@
     "forward_msg": {
       "aliases": ["fw"],
       "logs": {
-        "usage_error": "[e]-fw <no> <user>[/e]",
-        "invalid_msg_num": "[e]Invalid message number[/e]",
-        "user_not_specified": "[e]User not specified[/e]",
-        "no_such_user": "[e]No such user {user_arg}[/e]",
+        "usage_error": "[error]-fw <no> <user>",
+        "invalid_msg_num": "[error]Invalid message number[/error]",
+        "user_not_specified": "[error]User not specified[/error]",
+        "no_such_user": "[error]No such user {user_arg}[/error]",
         "generic_error": "[e]Error forwarding message: {error_msg}[/e]"
       }
     },
@@ -165,36 +147,37 @@
     "dm_nav": {
       "aliases": ["cf"],
       "logs": {
-        "success": "[i]DM: {name}[/i]",
-        "not_found": "[e]FRIEND NOT FOUND: {name}[/e]"
+        "success": "**DM**: {name}",
+        "not_found": "[red]FRIEND NOT FOUND: {name}[/]"
       }
     },
     "notifications": {
       "aliases": ["ntf", "notif"],
       "logs": {
         "no_pings": "[i]No pings.[/i]",
-        "ping_details": "[o]{index}. {author} @ {channel}: {content} ({timestamp})[/o]"
+        "ping_details": "[o]{index}. {author} @ {channel}: {content}[o]"
       }
     },
     "go_to_notification": {
       "aliases": ["gntf", "gonotif"],
       "logs": {
-        "bad_index": "[e]Bad notification index[/e]"
+        "bad_index": "[e]Bad index[/e]"
       }
     },
     "message_send": {
       "logs": {
-        "fail": "[e]FAIL TO SEND MESSAGE: {error_msg}[/e]",
-        "no_channel_selected": "[e]Select a server and channel first.[/e]"
+        "fail": "[e]FAIL TO SEND MESSAGES: {error_msg}[e]",
+        "no_channel_selected": "[e]Select server & channel first. Use `server and `channel first.[e]"
       }
     },
     "react": {
       "aliases": ["ct"],
       "logs": {
-        "invalidIndex": "[e]Invalid message index[/e]",
-        "success": "[o]Reacted with {emoji} to message {idx}.[/o]",
-        "error": "[e]Error reacting: {e}[/e]"
-      }
+        "moreThanThree": "[e]Usage: -ct <message no.> <emoji>[/e], ex: -ct 5 :sob:",
+	"invalidIndex": "[e]Invalid message index[/e]",
+	"success": "[o]Reacted with {emoji} to message {idx}.[/o]",
+	"error": "[e]Error reacting: {e}[/e]"
+      }		    
     },
     "open_attachment": {
       "aliases": ["open"],
@@ -205,47 +188,10 @@
         "no_attachments": "[i]No attachments in that message.[/i]",
         "attachment_index_out_of_range": "[e]Attachment index {index} out of range.[/e]",
         "error_saving": "[e]Error saving attachment: {error_msg}[/e]",
-        "opened_image": "[o]Opened image: {filename}.[/o]",
+        "opened_image": "[o]Opened image: {filename} in browser.[/o]",
         "opened_text": "[o]Opened text file: {filename}.[/o]",
         "error_opening_file": "[e]Error opening file: {error_msg}[/e]",
         "no_open_command": "[i]No open command for {filename}.[/i]"
-      }
-    },
-    "image_preview": {
-      "aliases": ["v"],
-      "logs": {
-        "usage": "[e]Usage: -v <message no.> <image no.>[/e]",
-        "out_of_range": "[e]Message or image index is out of range.[/e]",
-        "error": "[e]Image preview failed: {error_msg}[/e]"
-      }
-    },
-    "bookmark": {
-      "aliases": ["bm"],
-      "logs": {
-        "usage": "[e]Usage: -bm <message no.>[/e]",
-        "bad_index": "[e]Bad message index[/e]",
-        "saved": "[o]Bookmark saved.[/o]",
-        "exists": "[i]That message is already bookmarked.[/i]"
-      }
-    },
-    "bookmarks": {
-      "aliases": ["bms"],
-      "logs": {
-        "empty": "[i]No bookmarks.[/i]",
-        "details": "[o]{index}. {author}: {content} ({timestamp})[/o]"
-      }
-    },
-    "delete_bookmark": {
-      "aliases": ["dbm"],
-      "logs": {
-        "bad_index": "[e]Bad bookmark index[/e]",
-        "removed": "[o]Bookmark removed.[/o]"
-      }
-    },
-    "go_to_bookmark": {
-      "aliases": ["gbm"],
-      "logs": {
-        "bad_index": "[e]Bad bookmark index[/e]"
       }
     },
     "config_editor": {

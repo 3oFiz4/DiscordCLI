@@ -1,0 +1,6 @@
+clipboard
+discord.py-self
+emoji
+playsound3
+prompt_toolkit
+rich
