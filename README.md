@@ -1,33 +1,23 @@
 ![Preview](https://github.com/user-attachments/assets/8067db4a-0f02-457f-b6ef-3897aefdb14f)
-# ⚙️ DiscordCLI
-> A Discord terminal client built in ~4 hours. Functional: message, reply, upload — all from the command line.
+# DiscordCLI
+> A Discord terminal client built in ~4 hours (initially). Functional: message, reply, upload — all from the command line.
+<img width="786" height="508" alt="image" src="https://github.com/user-attachments/assets/a590052d-c0b2-41b0-8a82-ab058bb18726" />
 
 ---
 
-## 🖼️ Thumbnail
+## Thumbnail
 ![Banner](https://github.com/user-attachments/assets/e072021d-ab9c-4edd-beb6-d38d19f75b51)
-
-Watch more of the showcase here:
-https://jmp.sh/s/d63EFvt1hZTQpvic5paR
 
 ---
 
 ## ⚠️ Caution
-> ⚠️ **USE AT YOUR OWN RISK**
+> **USE AT YOUR OWN RISK**
 
 This client acts like a **selfbot**, and using it **violates Discord's TOS**.  
 You **may get banned**.  
 I am **not responsible** for any account loss.  
 
 ✅ Use an **alt account**, or use within a proper **Discord Bot** context.
-
----
-
-## 📦 Requirements
-
-```
-emoji==1.6.3 clipboard rich prompt_toolkit discord.py asyncio shutil tkinter playsound threading json
-````
 
 ---
 
@@ -63,41 +53,43 @@ python main.py
 1. Clone this repo to:
    `C:/Users/[your-name]/DisCLI`
 2. Open `System Properties` → `Advanced` → `Environment Variables`
-3. Under **System Variables**, edit `Path`
+3. Under **System Variables**, edit `PATH`
 4. Add:
    `C:\Users\[your-name]\DisCLI\`
 5. Click `OK` on all windows.
 
-Now you can run `main.py` from anywhere.
+Now you can run `main.py` from anywhere, by running `dc`. This is because of the `discordcli.bat`, but it assumes you are using `pip` to install, if you used `uv` please, change it to `uv`.
 
 ---
 
-## 🧩 Command List
+## Command List
 
 > `-h` → help
 > `-changelog` → recent updates
 
 <details>
-<summary><strong>🧭 Navigation</strong></summary>
+<summary><strong>Navigation</strong></summary>
 
 ```
--s [server]         Pick a server
--c [channel]        Pick a chat channel (needs -s first)
--cf [friend]        Pick a friend to DM
--q / -e             Quit the CLI
--ct [emoji]         React a message with emoji, ex: -ct 5 :sob:
+-s [server]               Pick a server
+-c [channel]              Pick a chat channel (needs -s first)
+-cf [friend]              Pick a friend to DM
+-q / -e                   Quit the CLI
+-ct [emoji]               React a message with emoji, ex: -ct 5 :sob:
+
+### NEW ###
+
+-k [channel of a server/dm]  A combination of both -s and -c, Discord Quick Go to feature
 ```
 
 </details>
 
 <details>
-<summary><strong>⌨️ Typing</strong></summary>
+<summary><strong>Typing</strong></summary>
 
 ```
 -r [index] [msg]    Reply to message by index
 -d [idx ...]        Delete messages (list accepted)
--up                Upload a file (via Explorer popup)
--deup              Clear all staged uploads
 -fw [idx] [target]  Forward message to someone
 -y [index]           Copy or Yank a message
 -p [index]          Pin a message, if authorized 
@@ -106,37 +98,62 @@ Now you can run `main.py` from anywhere.
 "say"               Without (-) will say something in current_channel, also sends a file if -up is triggered before
 "@"                 List all mentionable users
 ":...:"             List all possible emoji
+
+-up                Upload a file (via Explorer popup)
+-deup              Clear all staged uploads
+### NEW ###
+-dw [idx] [idx_attachment]    Download an attachment at [idx_attachment] from message with [idx]
+-dw [idx]                     Download all attachment under message with [idx]
+-open [idx] [idx_attachment]  Download/Save and open the attachment
+-v [idx] [idx_attachment]     Preview an image attachment, uses Chafa iterm, ensure chafa is installed, and if your terminal is incapable of showing the image, use terminal like WezTerm or other that supports SIXEL.
 ```
 
 </details>
 
 <details>
-<summary><strong>🔔 Misc</strong></summary>
+<summary><strong>Misc</strong></summary>
 
 ```
 -ntf / -notif       Show notifications
 -gntf / -gonotif    Jump to notif source
 ->n / -<n           Scroll newest/oldest by n messages
+
+### NEW ###
+-vn                Record from microphone until you pressed Enter
+-vn [audio_path]   Send specific audio file. Ensure ffmpeg and ffprobe is installed
+-vc                List voice channels in a server
+-typing            Show whether typing signal is enabled or not
+-typing [on/off]   Enable/Disable typing indicator for others. Disabling this makes the moment you sent a message, as if it appear in an instant, without any indicator of typing, which can be suspected for self-botting
+
+## NEW 2 ###
+-bm [idx]          Save message in a bookmark
+-bms               List saved message in a bookmark
+-dbm [idx]         Delete message in a bookmark
+-gbm [idx]         Go to that specific bookmarked message
+
+### on development ###
+-vc [channel]      Join specific voice channel
+-vcs <not_work>    Show members, speaking, muted, deafened status
+-lvc               Leave from the voice channel (when -vc is triggered already)               
+
 ```
 </details>
 
 ---
 
-## 🐞 Known Bugs
+## Known Bugs
 
 > *Minor = doesn't affect core usage much*
 
-* emoji picker wont work on `react` command. *i can actually fix it, but my time is up already`
 * @ mention won't work.
 * (minor) Screen may scroll to top on mention
 * (minor) Command auto-complete can break before API init (fix: press space and retype)
-* (minor) Display name invisibility on some servers
 
 🐛 Found a bug? [Submit an Issue](../../issues)
 
 ---
 
-## ✅ Features
+## Features
 
 ### ✔ Done
 
@@ -152,17 +169,21 @@ Now you can run `main.py` from anywhere.
 * Rich config via `conf.json`
 * Multi-token login
 * Multi-Access Login (either via ~~Username and Password (not possible apparently, it asked for CAPTCHA instead)~~ or Token)
+* Per-channel notification sounds (might be improved in the future)
+* Bookmark Message
+* Quick Navigation
+* Image Preview (requires Chafa, and Terminal that supports iterm or sixel)
+* Open and Downloading an attachment
+* Voice recording (requires ffmpeg)
+* Typing Indicator
 ### 🚧 Planned / In Progress
-* ⏳ Per-channel notification sounds
-* ⏳ Hotkey support
-* ⏳ Change profile pic, bio, banner
-* ⏳ Open files via browser
-* ⏳ Colored text / markdown preview (via `rich` and `lexer`
-* ⏳ Snippets like `{myutc}` → current time
-* ⏳ Join/leave server
-* ⏳ Bookmark message
-* ⏳ Join & Leave a server
-* ⏳ Color a text (similar to snippet, reference [Rebane Message Color](https://rebane2001.com/discord-colored-text-generator/)
+* Hotkey support (NVIM like)
+* Change profile pic, bio, banner
+* Open files via browser
+* Colored text / markdown preview (via `rich` and `lexer`)
+* Snippets like `{myutc}` → current time
+* Join/leave server
+* Color a text (similar to snippet, reference [Rebane Message Color](https://rebane2001.com/discord-colored-text-generator/)
 
 ---
 <details>
@@ -213,5 +234,6 @@ v25.06.17 (yy/mm/dd)
         - Added Account Template
             a. You can now switch to different account easily through `token.txt`
             b. Input token via `-t` in CLI
+   v26.07.29.01 (a lot of features added)
 <pre>
 </details>
