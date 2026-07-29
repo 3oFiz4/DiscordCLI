@@ -6,6 +6,10 @@
     "role_based_username_color": true,
     "incoming_typing_indicator": true,
     "outgoing_typing_indicator": true,
+    "voice_audio": {
+      "input_device": null,
+      "output_device": null
+    },
     "timezone": "Asia/Makassar",
     "notification_scan": {
       "enabled": true,
@@ -30,6 +34,10 @@
   },
   "colorInput": {
     "command": "#ff0000",
+    "command.valid": "underline bold #ff0000",
+    "typing": "italic #ff0000",
+    "voice": "bold #ff0000",
+    "voice.speaking": "bold underline #ff0000",
     "default": ""
   },
   "pallete": {
@@ -73,13 +81,25 @@
     "changelog": {
       "aliases": ["changelog"],
       "logs": {
-        "content": "[purple]v26.07.29\n    - Quick Go channel and DM search\n    - Live valid-command underline lexer\n    - Discord voice-note sending\n    - Sticker display and terminal preview\n    - Any-file upload and download\n    - Voice-channel join, move, status, and leave\n    - Incoming and outgoing typing indicators\n    - Structured OOP package\n    - Chafa iTerm image preview\n    - Reply-to-you indicator\n    - Role-based username color option\n    - Persistent startup notifications\n    - Synchronized local timestamps\n    - Topmost upload picker\n    - Message bookmarks\n    - Per-channel notification sounds[/purple]"
+        "content": "[red]v26.07.29\n    - Fixed legacy FilePicker injection for live voice-note recording\n    - Native voice compatibility diagnostics and transmit-only fallback\n    - Typing and voice status moved directly below the input prompt\n    - Removed dependency version pins to allow compatible resolution\n    - Fixed Python 3.14 upload picker filetype handling\n    - Fixed exact Quick Go destinations and punctuation matching\n    - Live microphone recording stored as MP3 for voice notes\n    - Full-duplex voice channel microphone and speaker audio\n    - Voice member list and live speaking indicator\n    - Quick Go channel and DM search\n    - Live valid-command underline lexer\n    - Discord voice-note sending\n    - Sticker display and terminal preview\n    - Any-file upload and download\n    - Voice-channel join, move, status, and leave\n    - Incoming and outgoing typing indicators\n    - Structured OOP package\n    - Chafa iTerm image preview\n    - Reply-to-you indicator\n    - Role-based username color option\n    - Persistent startup notifications\n    - Synchronized local timestamps\n    - Topmost upload picker\n    - Message bookmarks\n    - Per-channel notification sounds[/red]"
       }
     },
     "help": {
       "aliases": ["h", "help"],
       "logs": {
-        "content": "[purple]Quick Go and navigation:\n    -k <query>                  Search every text channel and DM, then go directly when one result matches.\n    -k <result no.>             Open a numbered result from the last Quick Go search.\n    -s <server name>            Select a server. Type the start of its name for completion.\n    -c <channel name>           Open a text channel in the selected server.\n    -cf <username>              Open a direct-message conversation.\n    -<                          Show the next older page of chat history.\n    ->                          Show the next newer page of chat history.\n\nMessages:\n    -r <message no.> <text>     Reply to a displayed message. Staged files are included.\n    -e <message no.> <text>     Edit one of your messages. Omit text to load it into the input.\n    -d <message no. ...>        Delete one or more of your displayed messages.\n    -fw <message no.> <user>    Forward the text of a message to a direct-message user.\n    -y <message no.>            Copy a message's text to the clipboard.\n    -p <message no.>            Pin a message.\n    -dp <message no.>           Unpin a message.\n    -ct <message no.> <emoji>   Add a reaction using an emoji or emoji alias.\n\nFiles, images, stickers, and voice notes:\n    -up                         Open a topmost picker and stage any file for the next message or reply.\n    -deup                       Remove every currently staged upload.\n    -dw <message no.>           Download every attachment from a message into the download folder.\n    -dw <message no.> <no. ...> Download only the selected attachment numbers.\n    -open <message no.> <no. ...> Save and open selected attachments with the operating system.\n    -v <message no.> <image no.> Preview an image attachment using Chafa iTerm symbols.\n    -v <message no.> s<no.>     Preview a PNG, APNG, or GIF sticker; Lottie stickers are identified but cannot be rendered by Chafa.\n    -vn                         Pick audio, convert it, and send it as a Discord voice note.\n    -vn <audio path>            Send the specified audio file as a Discord voice note. Requires ffmpeg and ffprobe in PATH.\n\nVoice channels:\n    -vc                         List voice channels in the selected server.\n    -vc <channel name or ID>    Join a voice channel, or move there when already connected.\n    -vcs                        Show the current voice-channel connection.\n    -lvc                        Leave the current voice channel.\n\nTyping indicators:\n    -typing                     Show whether your outgoing typing signal is enabled.\n    -typing on                  Send Discord typing events while composing a normal message.\n    -typing off                 Stop sending your typing events. Incoming typing remains visible below the prompt.\n\nNotifications:\n    -ntf                        List stored pings and direct messages found since the previous session.\n    -gntf <notification no.>    Open the channel and message belonging to a notification.\n\nBookmarks:\n    -bm <message no.>           Save a displayed message as a bookmark.\n    -bms                        List saved bookmarks.\n    -dbm <bookmark no.>         Delete a bookmark from the list.\n    -gbm <bookmark no.>         Open the channel and message belonging to a bookmark.\n\nOther:\n    -help                       Show this full command reference.\n    -changelog                  Show the feature changelog.\n    -conf                       Show the current reserved configuration-editor status.\n    -q                          Close the client.[/purple]"
+        "content": "[red]Quick Go and navigation:\n    -k <query>                  Search every text channel and DM, then go directly when one result matches.\n    -k <server / #channel>      Open an exact completed Quick Go destination.\n    -k <result no.>             Open a numbered result from the last Quick Go search.\n    -s <server name>            Select a server. Type the start of its name for completion.\n    -c <channel name>           Open a text channel in the selected server.\n    -cf <username>              Open a direct-message conversation.\n    -<                          Show the next older page of chat history.\n    ->                          Show the next newer page of chat history.\n\nMessages:\n    -r <message no.> <text>     Reply to a displayed message. Staged files are included.\n    -e <message no.> <text>     Edit one of your messages. Omit text to load it into the input.\n    -d <message no. ...>        Delete one or more of your displayed messages.\n    -fw <message no.> <user>    Forward the text of a message to a direct-message user.\n    -y <message no.>            Copy a message's text to the clipboard.\n    -p <message no.>            Pin a message.\n    -dp <message no.>           Unpin a message.\n    -ct <message no.> <emoji>   Add a reaction using an emoji or emoji alias.\n\nFiles, images, stickers, and voice notes:\n    -up                         Open a topmost picker and stage any file for the next message or reply.\n    -deup                       Remove every currently staged upload.\n    -dw <message no.>           Download every attachment from a message into the download folder.\n    -dw <message no.> <no. ...> Download only the selected attachment numbers.\n    -open <message no.> <no. ...> Save and open selected attachments with the operating system.\n    -v <message no.> <image no.> Preview an image attachment using Chafa iTerm symbols.\n    -v <message no.> s<no.>     Preview a PNG, APNG, or GIF sticker; Lottie stickers are identified but cannot be rendered by Chafa.\n    -vn                         Record from the microphone until Enter, store an MP3, and send it as a Discord voice note.\n    -vn <audio path>            Send the specified audio file as a Discord voice note. Requires ffmpeg and ffprobe in PATH.\n\nVoice channels:\n    -vc                         List voice channels in the selected server.\n    -vc <channel name or ID>    Join or move to voice and transmit your microphone. Compatible native voice also enables hearing members.\n    -vcs                        Show connection mode, channel, members, and speaking, muted, or deafened status.\n    -lvc                        Stop audio devices and leave the current voice channel.\n\nTyping indicators:\n    -typing                     Show whether your outgoing typing signal is enabled.\n    -typing on                  Send Discord typing events while composing a normal message.\n    -typing off                 Stop sending your typing events. Incoming typing remains directly below the prompt.\n\nNotifications:\n    -ntf                        List stored pings and direct messages found since the previous session.\n    -gntf <notification no.>    Open the channel and message belonging to a notification.\n\nBookmarks:\n    -bm <message no.>           Save a displayed message as a bookmark.\n    -bms                        List saved bookmarks.\n    -dbm <bookmark no.>         Delete a bookmark from the list.\n    -gbm <bookmark no.>         Open the channel and message belonging to a bookmark.\n\nOther:\n    -help                       Show this full command reference.\n    -changelog                  Show the feature changelog.\n    -conf                       Show the current reserved configuration-editor status.\n    -q                          Close the client.[/red]"
+      }
+    },
+    "voice_help": {
+      "aliases": [],
+      "logs": {
+        "content": "[red]Voice mixer controls:\n    -vc <channel name or ID>    Join or move to voice, hear members, and transmit your microphone.\n    -vcs                        Show live members, speaking state, mixer state, devices, and received/output byte counts.\n    -vmute <member|self>        Locally mute a member, or mute your outgoing microphone.\n    -vunmute <member|self>      Locally unmute a member, or unmute your outgoing microphone.\n    -vvol <member|self> <0-200> Set local member volume or your outgoing microphone gain percentage.\n\nVoice device configuration:\n    settings.voice_audio.input_device accepts a sounddevice input device name or index.\n    settings.voice_audio.output_device accepts a sounddevice output device name or index.\n    Use null for either value to use the operating-system default device.[/red]"
+      }
+    },
+    "voice_changelog": {
+      "aliases": [],
+      "logs": {
+        "content": "[red]Voice update:\n    - Fixed receive buffering so decoded packet remainders are no longer discarded\n    - Guarded input and output callbacks so one audio error does not silently stop playback\n    - Added live member names and speaking status below the prompt\n    - Added per-member and self mute and volume controls\n    - Added input/output device configuration and -vcs audio diagnostics[/red]"
       }
     },
     "quick_go": {
@@ -173,7 +193,8 @@
       "aliases": ["up"],
       "logs": {
         "null": "[o]Null.[/o]",
-        "staged": "[o]Staged: {filename}[/o]"
+        "staged": "[o]Staged: {filename}[/o]",
+        "error": "[e]Upload picker failed: {error_msg}[/e]"
       }
     },
     "deupload_stage": {
@@ -198,6 +219,7 @@
       "logs": {
         "no_channel": "[e]Open a text channel or DM before sending a voice note.[/e]",
         "sent": "[o]Voice note sent.[/o]",
+        "sent_recorded": "[o]Voice note sent. MP3 stored at: {path}[/o]",
         "error": "[e]Voice note failed: {error_msg}[/e]"
       }
     },
@@ -210,6 +232,7 @@
         "usage": "[i]Usage: -vc <channel name or ID>[/i]",
         "not_found": "[e]Voice channel not found: {name}[/e]",
         "joined": "[o]Connected to voice channel: {name}[/o]",
+        "limited": "[i]Voice is using transmit-only compatibility mode. Receiving audio needs a compatible discord.py-self and discord-native-voice pair. Diagnostic: {error_msg}[/i]",
         "error": "[e]Voice connection failed: {error_msg}[/e]"
       }
     },

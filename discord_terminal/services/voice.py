@@ -108,15 +108,18 @@ class VoiceService:
             entries.append(
                 {
                     "name": self.client.format_author(member),
+                    "id": member.id,
                     "speaking": member.id in speaking,
                     "self": self.client.user and member.id == self.client.user.id,
-                    "muted": bool(
+                    "discord_muted": bool(
                         voice
                         and (
                             getattr(voice, "mute", False)
                             or getattr(voice, "self_mute", False)
                         )
                     ),
+                    "local_muted": self.audio.is_muted(member.id),
+                    "volume": self.audio.volume(member.id),
                     "deafened": bool(
                         voice
                         and (
@@ -127,6 +130,73 @@ class VoiceService:
                 }
             )
         return entries
+
+    def member(self, query):
+        current = self.current()
+        if not current:
+            raise RuntimeError("Join a voice channel first.")
+        lowered = query.strip().casefold()
+        if lowered in {"self", "me", "myself"}:
+            member = discord.utils.get(
+                current.channel.members,
+                id=self.client.user.id,
+            )
+            if member:
+                return member
+            raise ValueError("Your member entry is not available yet.")
+        exact = []
+        partial = []
+        for member in current.channel.members:
+            values = {
+                str(member.id),
+                getattr(member, "name", ""),
+                getattr(member, "display_name", ""),
+                getattr(member, "global_name", ""),
+                getattr(member, "nick", ""),
+                self.client.format_author(member),
+            }
+            normalized = {
+                str(value).casefold()
+                for value in values
+                if value
+            }
+            if lowered in normalized:
+                exact.append(member)
+            elif any(lowered in value for value in normalized):
+                partial.append(member)
+        matches = exact or partial
+        if len(matches) == 1:
+            return matches[0]
+        if not matches:
+            raise ValueError("Voice member not found: {}".format(query))
+        raise ValueError(
+            "Voice member is ambiguous: {}".format(
+                ", ".join(
+                    self.client.format_author(member)
+                    for member in matches
+                )
+            )
+        )
+
+    async def set_muted(self, query, muted):
+        member = self.member(query)
+        self.audio.set_muted(member.id, muted)
+        if self.client.user and member.id == self.client.user.id:
+            current = self.current()
+            try:
+                await current.channel.guild.change_voice_state(
+                    channel=current.channel,
+                    self_mute=muted,
+                    self_deaf=False,
+                )
+            except Exception:
+                pass
+        return member
+
+    def set_volume(self, query, percent):
+        member = self.member(query)
+        volume = self.audio.set_volume(member.id, percent)
+        return member, volume
 
     def speaking_names(self):
         return [
@@ -143,9 +213,21 @@ class VoiceService:
             current.channel.name,
             len(current.channel.members),
         )
+        names = [
+            member["name"]
+            for member in self.members()
+        ]
+        if names:
+            text += ": {}".format(", ".join(names))
+        fragments = [("class:voice", text)]
         speakers = self.speaking_names()
         if speakers:
-            text += " | speaking: {}".format(", ".join(speakers))
+            fragments.extend(
+                [
+                    ("class:voice", " | speaking: "),
+                    ("class:voice.speaking", ", ".join(speakers)),
+                ]
+            )
         if not self.audio.receive_enabled:
-            text += " | transmit only"
-        return [("class:voice", text)]
+            fragments.append(("class:voice", " | transmit only"))
+        return fragments

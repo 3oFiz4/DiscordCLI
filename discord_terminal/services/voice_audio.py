@@ -3,9 +3,10 @@ import queue
 import sys
 import threading
 import time
-from collections import deque
 
 import discord
+
+from discord_terminal.services.voice_mixer import VoiceMixer
 
 
 class MicrophoneFrames:
@@ -76,15 +77,19 @@ class VoiceAudioBridge:
         self.input_stream = None
         self.output_stream = None
         self.microphone = None
-        self.playback = {}
-        self.speakers = {}
-        self.lock = threading.Lock()
+        self.mixer = VoiceMixer()
         self.active = False
         self.last_invalidate = 0
         self.speaker_timer = None
         self.mode = "disconnected"
         self.receive_enabled = False
         self.diagnostic = ""
+        self.last_error = ""
+        self.received_packets = 0
+        self.received_bytes = 0
+        self.played_bytes = 0
+        self.input_device = ""
+        self.output_device = ""
 
     def start(self, voice_client, native_module=None, diagnostic=""):
         try:
@@ -100,6 +105,10 @@ class VoiceAudioBridge:
         self.voice_client = voice_client
         self.microphone = MicrophoneFrames()
         self.diagnostic = diagnostic
+        self.last_error = ""
+        self.received_packets = 0
+        self.received_bytes = 0
+        self.played_bytes = 0
         try:
             self.input_stream = sounddevice.RawInputStream(
                 samplerate=48000,
@@ -107,8 +116,13 @@ class VoiceAudioBridge:
                 dtype="int16",
                 blocksize=960,
                 callback=self._input,
+                device=self._configured_device("input_device"),
             )
             self.input_stream.start()
+            self.input_device = self._device_name(
+                sounddevice,
+                self.input_stream.device,
+            )
             if native_module:
                 self._start_native(sounddevice, native_module)
                 self.mode = "full-duplex"
@@ -129,8 +143,13 @@ class VoiceAudioBridge:
             dtype="int16",
             blocksize=960,
             callback=self._output,
+            device=self._configured_device("output_device"),
         )
         self.output_stream.start()
+        self.output_device = self._device_name(
+            sounddevice,
+            self.output_stream.device,
+        )
         source = native_module.AudioFrameSource(
             self.microphone,
             opus=False,
@@ -181,40 +200,62 @@ class VoiceAudioBridge:
         self.active = False
         self.mode = "disconnected"
         self.receive_enabled = False
-        with self.lock:
-            self.playback.clear()
-            self.speakers.clear()
+        self.mixer.clear_streams()
         if self.speaker_timer:
             self.speaker_timer.cancel()
             self.speaker_timer = None
         self._invalidate()
 
     def _input(self, indata, frame_count, time_info, status):
-        samples = array.array("h")
-        samples.frombytes(bytes(indata))
-        if sys.byteorder != "little":
-            samples.byteswap()
-        stereo = array.array("h")
-        for sample in samples:
-            stereo.append(sample)
-            stereo.append(sample)
-        if sys.byteorder != "little":
-            stereo.byteswap()
-        if self.microphone:
-            self.microphone.put(stereo.tobytes())
+        try:
+            samples = array.array("h")
+            samples.frombytes(bytes(indata))
+            if sys.byteorder != "little":
+                samples.byteswap()
+            stereo = array.array("h")
+            for sample in samples:
+                stereo.append(sample)
+                stereo.append(sample)
+            if sys.byteorder != "little":
+                stereo.byteswap()
+            payload = stereo.tobytes()
+            user_id = getattr(self.client.user, "id", None)
+            if user_id is not None:
+                if self.mixer.is_muted(user_id):
+                    payload = bytes(len(payload))
+                else:
+                    payload = self.mixer.scale(
+                        payload,
+                        self.mixer.volume(user_id),
+                    )
+            if self.microphone:
+                self.microphone.put(payload)
+        except Exception as error:
+            self.last_error = "{}: {}".format(
+                type(error).__name__,
+                error,
+            )
 
     def _receive(self, packet):
-        if packet.media_type != "audio" or packet.codec != "pcm":
+        if (
+            str(getattr(packet, "media_type", "")).lower() != "audio"
+            or str(getattr(packet, "codec", "")).lower() != "pcm"
+        ):
             return
-        user_id = packet.user_id
+        user_id = getattr(packet, "user_id", None)
         if self.client.user and user_id == self.client.user.id:
             return
         now = time.monotonic()
-        with self.lock:
-            frames = self.playback.setdefault(user_id, deque(maxlen=8))
-            frames.append(packet.payload)
-            if packet.audio_voice_activity is not False and packet.audio_level != 127:
-                self.speakers[user_id] = now
+        try:
+            self.mixer.push(packet)
+            self.received_packets += 1
+            self.received_bytes += len(packet.payload)
+        except Exception as error:
+            self.last_error = "{}: {}".format(
+                type(error).__name__,
+                error,
+            )
+            return
         if now - self.last_invalidate >= 0.2:
             self.last_invalidate = now
             self._invalidate()
@@ -226,42 +267,59 @@ class VoiceAudioBridge:
 
     def _output(self, outdata, frames, time_info, status):
         size = frames * 4
-        chunks = []
-        with self.lock:
-            for user_id, pending in list(self.playback.items()):
-                if pending:
-                    chunks.append(pending.popleft())
-                if not pending:
-                    self.playback.pop(user_id, None)
-        outdata[:] = self._mix(chunks, size)
-
-    def _mix(self, chunks, size):
-        if not chunks:
-            return bytes(size)
-        output = array.array("h", [0] * (size // 2))
-        for chunk in chunks:
-            samples = array.array("h")
-            samples.frombytes(chunk[:size])
-            if sys.byteorder != "little":
-                samples.byteswap()
-            for index, sample in enumerate(samples):
-                value = output[index] + sample
-                output[index] = max(-32768, min(32767, value))
-        if sys.byteorder != "little":
-            output.byteswap()
-        return output.tobytes()
+        try:
+            payload = self.mixer.mix(size)
+            outdata[:] = payload
+            if any(payload):
+                self.played_bytes += len(payload)
+        except Exception as error:
+            outdata[:] = bytes(size)
+            self.last_error = "{}: {}".format(
+                type(error).__name__,
+                error,
+            )
 
     def speaking_ids(self):
-        now = time.monotonic()
-        with self.lock:
-            expired = [
-                user_id
-                for user_id, seen in self.speakers.items()
-                if now - seen > 0.8
-            ]
-            for user_id in expired:
-                self.speakers.pop(user_id, None)
-            return set(self.speakers)
+        return self.mixer.speaking_ids()
+
+    def set_muted(self, user_id, muted):
+        self.mixer.set_muted(user_id, muted)
+        self._invalidate()
+
+    def is_muted(self, user_id):
+        return self.mixer.is_muted(user_id)
+
+    def set_volume(self, user_id, percent):
+        value = self.mixer.set_volume(user_id, float(percent) / 100)
+        self._invalidate()
+        return round(value * 100)
+
+    def volume(self, user_id):
+        return round(self.mixer.volume(user_id) * 100)
+
+    def statistics(self):
+        return {
+            "received_packets": self.received_packets,
+            "received_bytes": self.received_bytes,
+            "played_bytes": self.played_bytes,
+            "input_device": self.input_device or "default",
+            "output_device": self.output_device or "default",
+            "last_error": self.last_error or "none",
+        }
+
+    def _configured_device(self, name):
+        return self.client.config.get(
+            "settings",
+            "voice_audio",
+            name,
+            default=None,
+        )
+
+    def _device_name(self, sounddevice, device):
+        try:
+            return sounddevice.query_devices(device)["name"]
+        except Exception:
+            return str(device)
 
     def _invalidate(self):
         try:
