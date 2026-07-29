@@ -42,11 +42,9 @@ class ImagePreviewService:
             subprocess.run(
                 [
                     executable,
-                    "--format=iterm",
-                    "--clear",
-                    "--align=center",
-                    "--animate=off",
                     str(path),
+                    "--format=iterm",
+                    "--align=center",
                 ],
                 check=False,
             )
