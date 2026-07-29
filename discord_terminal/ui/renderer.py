@@ -93,12 +93,16 @@ class HistoryRenderer:
                 author=author,
             )
         else:
-            key = "message_header_reply_to_self" if reply_to_self else "message_header_reply"
+            key = (
+                "message_header_reply_to_self"
+                if reply_to_self
+                else "message_header_reply"
+            )
             template = history_config.get(
                 key,
                 "<{index}@{replied_index} {timestamp} {author}>",
             )
-            indicator = history_config.get("reply_to_self_indicator", "REPLY TO YOU")
+            indicator = history_config.get("reply_to_self_indicator", "!")
             header = template.format(
                 index=display_index,
                 replied_index=reply_index,
@@ -121,7 +125,9 @@ class HistoryRenderer:
                 "[{}] {}".format(index + 1, escape(attachment.filename))
                 for index, attachment in enumerate(message.attachments)
             )
-            template = history_config.get("attachment", "[attachment]| {attaches}[/attachment]")
+            template = history_config.get(
+                "attachment", "[attachment]| {attaches}[/attachment]"
+            )
             self.ui.print(template.format(attaches=attachments))
 
         if message.reactions:

@@ -3,7 +3,7 @@
   "settings": {
     "show_displayname": true,
     "show_username": true,
-    "role_based_username_color": false,
+    "role_based_username_color": true,
     "timezone": "Asia/Makassar",
     "notification_scan": {
       "enabled": true,
@@ -26,18 +26,18 @@
     "account": "token.txt"
   },
   "colorInput": {
-    "command": "#00ff00",
+    "command": "#ff0000",
     "default": ""
   },
   "pallete": {
     "time": "grey39",
-    "self": "bold #ff00ff",
-    "other": "cyan",
-    "head": "#00ffff",
+    "self": "bold #ff0000",
+    "other": "#999999",
+    "head": "#ff0000",
     "attachment": "grey23",
-    "reply_to_self": "bold black on bright_yellow",
+    "reply_to_self": "bold red on #ffffff",
     "e": "bold red",
-    "o": "bold #00ff00",
+    "o": "bold #ff0000",
     "i": "bold yellow"
   },
   "events": {
@@ -47,16 +47,16 @@
       "timestamp_time": "%H:%M",
       "timestamp_date": "%d/%m/%y"
     },
-    "onReady": "[bold #00ff00]OK {user}[/]",
-    "onMessage": "[i]PING by {author} in {channel}[/i]",
+    "onReady": "[bold #ff0000]OK {user}[/]",
+    "onMessage": "[i][#ff0000]PING by {author} in {channel}[/][/i]",
     "history_render": {
-      "message_total": 30,
+      "message_total": 45,
       "header": "[head]@{current_guild}(#{current_channel}) |{start_index}-{end_index} / {total}|[/head]",
-      "message_header": "<{index} {timestamp} {author}>",
-      "message_header_reply": "<{index}@{replied_index} {timestamp} {author}>",
-      "message_header_reply_to_self": "[reply_to_self]<{index}@{replied_index} {timestamp} {author} | {indicator}>[/reply_to_self]",
-      "reply_to_self_indicator": "REPLY TO YOU",
-      "attachment": "[attachment]| {attaches}[/attachment]"
+      "message_header": "{index} {timestamp} {author}",
+      "message_header_reply": "{index}->[#ff0000]{replied_index}[/] {timestamp} {author}",
+      "message_header_reply_to_self": "[reply_to_self]{index}@{replied_index} {timestamp} {author}{indicator}[/reply_to_self]",
+      "reply_to_self_indicator": "!",
+      "attachment": "[attachment]|- {attaches}[/attachment]"
     }
   },
   "commands": {
