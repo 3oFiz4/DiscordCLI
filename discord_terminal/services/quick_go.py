@@ -38,22 +38,37 @@ class QuickGoService:
 
     def search(self, query):
         entries = self.destinations()
-        words = query.lower().split()
+        lowered = query.strip().lower()
+        exact = [
+            entry
+            for entry in entries
+            if entry["label"].lower() == lowered
+            or str(entry["channel"].id) == lowered
+        ]
+        if exact:
+            self.last_results = exact[:20]
+            return self.last_results
+        words = self._words(lowered)
         if words:
             entries = [
                 entry
                 for entry in entries
-                if all(word in entry["search"] for word in words)
+                if all(
+                    any(
+                        word in token
+                        for token in self._words(entry["search"])
+                    )
+                    for word in words
+                )
             ]
-        exact = [
-            entry
-            for entry in entries
-            if entry["label"].lower() == query.lower()
-        ]
-        if exact:
-            entries = exact
         self.last_results = entries[:20]
         return self.last_results
+
+    def _words(self, value):
+        normalized = value
+        for character in "/#@>":
+            normalized = normalized.replace(character, " ")
+        return normalized.split()
 
     def numbered(self, number):
         if number < 1 or number > len(self.last_results):

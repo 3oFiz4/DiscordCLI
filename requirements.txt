@@ -1,7 +1,10 @@
+pyperclip
 clipboard
-discord.py-self
 emoji
 playsound3
 prompt_toolkit
 rich
-discord.py-self[voice]>=2.1.0
+discord.py-self	
+discord.py-self[voice]
+discord-native-voice
+sounddevice

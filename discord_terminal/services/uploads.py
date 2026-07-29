@@ -10,8 +10,10 @@ class UploadService:
         self.staged = []
 
     def stage(self):
-        self.reset()
         picked = self.file_picker.pick()
+        if not picked:
+            return []
+        self.reset()
         for path in picked:
             destination = self.upload_dir / path.name
             shutil.copy2(path, destination)

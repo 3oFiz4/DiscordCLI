@@ -1,0 +1,17 @@
+[project]
+name = "discordcli"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "clipboard>=0.0.4",
+    "discord-native-voice>=0.1.0",
+    "discord-py-self[voice]>=2.1.0",
+    "emoji>=2.15.0",
+    "playsound3>=3.3.2",
+    "prompt-toolkit>=3.0.53",
+    "pyperclip>=1.11.0",
+    "rich>=15.0.0",
+    "sounddevice>=0.5.5",
+]

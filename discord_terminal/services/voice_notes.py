@@ -13,13 +13,17 @@ from discord.http import Route
 
 
 class VoiceNoteService:
-    def __init__(self, client, voice_dir, file_picker):
+    def __init__(self, client, voice_dir, recorder):
         self.client = client
         self.voice_dir = voice_dir
-        self.file_picker = file_picker
+        self.recorder = recorder
 
     async def send(self, channel, source=""):
-        source_path = self._source(source)
+        recorded = not source
+        if source:
+            source_path = self._source(source)
+        else:
+            source_path = await asyncio.to_thread(self.recorder.record)
         output_path = self.voice_dir / "{}.ogg".format(uuid.uuid4().hex)
         try:
             await asyncio.to_thread(self._convert, source_path, output_path)
@@ -42,26 +46,15 @@ class VoiceNoteService:
             await self.client._connection.http.request(route, json=payload)
         finally:
             output_path.unlink(missing_ok=True)
+        if recorded:
+            return source_path
+        return None
 
     def _source(self, source):
-        if source:
-            path = Path(source.strip().strip('"')).expanduser().resolve()
-            if not path.is_file():
-                raise FileNotFoundError("Audio file does not exist: {}".format(path))
-            return path
-        paths = self.file_picker.pick(
-            title="Choose audio for Discord voice note",
-            filetypes=[
-                (
-                    "Audio files",
-                    "*.wav *.mp3 *.m4a *.aac *.flac *.ogg *.opus *.webm",
-                ),
-                ("All files", "*.*"),
-            ],
-        )
-        if not paths:
-            raise RuntimeError("No audio file was selected.")
-        return paths[0]
+        path = Path(source.strip().strip('"')).expanduser().resolve()
+        if not path.is_file():
+            raise FileNotFoundError("Audio file does not exist: {}".format(path))
+        return path
 
     def _tools(self):
         ffmpeg = shutil.which("ffmpeg")
