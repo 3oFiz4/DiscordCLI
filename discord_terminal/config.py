@@ -50,3 +50,7 @@ class Configuration:
 
     def clone(self):
         return deepcopy(self.data)
+
+    def save(self):
+        content = json.dumps(self.data, indent=2, ensure_ascii=False)
+        self.path.write_text(content + "\n", encoding="utf-8")

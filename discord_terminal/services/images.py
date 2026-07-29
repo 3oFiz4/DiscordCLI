@@ -17,6 +17,22 @@ class ImagePreviewService:
         await attachment.save(path)
         return await asyncio.to_thread(self._view, path)
 
+    async def preview_sticker(self, sticker):
+        sticker_format = getattr(sticker, "format", None)
+        extension = getattr(sticker_format, "file_extension", "png")
+        if extension == "json":
+            raise ValueError(
+                "This is a Lottie sticker. Chafa cannot render Lottie JSON."
+            )
+        filename = "{}_{}.{}".format(
+            sticker.id,
+            Path(sticker.name).name,
+            extension,
+        )
+        path = self.preview_dir / filename
+        path.write_bytes(await sticker.read())
+        return await asyncio.to_thread(self._view, path)
+
     def _view(self, path):
         executable = shutil.which("chafa")
         if not executable:
@@ -26,10 +42,11 @@ class ImagePreviewService:
             subprocess.run(
                 [
                     executable,
-                    str(path),
-                    "-f",
-                    "iterm",
+                    "--format=iterm",
+                    "--clear",
                     "--align=center",
+                    "--animate=off",
+                    str(path),
                 ],
                 check=False,
             )

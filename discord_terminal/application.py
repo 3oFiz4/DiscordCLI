@@ -9,6 +9,8 @@ from discord_terminal.commands.media import MediaCommands
 from discord_terminal.commands.messages import MessageCommands
 from discord_terminal.commands.navigation import NavigationCommands
 from discord_terminal.commands.notifications import NotificationCommands
+from discord_terminal.commands.quick_go import QuickGoCommands
+from discord_terminal.commands.voice import VoiceCommands
 from discord_terminal.config import Configuration
 from discord_terminal.paths import ApplicationPaths
 from discord_terminal.services.credentials import ArgumentParser, CredentialStore
@@ -71,7 +73,9 @@ class Application:
         )
         handlers = [
             GeneralCommands(client, self.config, self.ui),
+            QuickGoCommands(client, self.config, self.ui),
             NavigationCommands(client, self.config, self.ui),
+            VoiceCommands(client, self.config, self.ui),
             MediaCommands(client, self.config, self.ui),
             BookmarkCommands(client, self.config, self.ui),
             NotificationCommands(client, self.config, self.ui),

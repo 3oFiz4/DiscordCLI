@@ -93,16 +93,12 @@ class HistoryRenderer:
                 author=author,
             )
         else:
-            key = (
-                "message_header_reply_to_self"
-                if reply_to_self
-                else "message_header_reply"
-            )
+            key = "message_header_reply_to_self" if reply_to_self else "message_header_reply"
             template = history_config.get(
                 key,
                 "<{index}@{replied_index} {timestamp} {author}>",
             )
-            indicator = history_config.get("reply_to_self_indicator", "!")
+            indicator = history_config.get("reply_to_self_indicator", "REPLY TO YOU")
             header = template.format(
                 index=display_index,
                 replied_index=reply_index,
@@ -122,13 +118,31 @@ class HistoryRenderer:
 
         if message.attachments:
             attachments = " ".join(
-                "[{}] {}".format(index + 1, escape(attachment.filename))
+                "#{} {} ({})".format(
+                    index + 1,
+                    escape(attachment.filename),
+                    self._attachment_details(attachment),
+                )
                 for index, attachment in enumerate(message.attachments)
             )
-            template = history_config.get(
-                "attachment", "[attachment]| {attaches}[/attachment]"
-            )
+            template = history_config.get("attachment", "[attachment]| {attaches}[/attachment]")
             self.ui.print(template.format(attaches=attachments))
+
+        stickers = getattr(message, "stickers", [])
+        if stickers:
+            sticker_text = " ".join(
+                "s{} {} ({})".format(
+                    index + 1,
+                    escape(sticker.name),
+                    escape(self._sticker_format(sticker)),
+                )
+                for index, sticker in enumerate(stickers)
+            )
+            template = history_config.get(
+                "sticker",
+                "[sticker]| Sticker {stickers}[/sticker]",
+            )
+            self.ui.print(template.format(stickers=sticker_text))
 
         if message.reactions:
             reactions = " ".join(
@@ -136,6 +150,30 @@ class HistoryRenderer:
                 for reaction in message.reactions
             )
             self.ui.print("     {}".format(escape(reactions)))
+
+    def _attachment_details(self, attachment):
+        size = getattr(attachment, "size", 0)
+        if size >= 1024 * 1024:
+            size_text = "{:.1f} MiB".format(size / 1024 / 1024)
+        elif size >= 1024:
+            size_text = "{:.1f} KiB".format(size / 1024)
+        else:
+            size_text = "{} B".format(size)
+        duration = getattr(attachment, "duration", None)
+        if duration is None:
+            duration = getattr(attachment, "duration_secs", None)
+        if duration is not None:
+            return "voice note, {:.1f}s, {}".format(duration, size_text)
+        content_type = getattr(attachment, "content_type", None)
+        return "{}, {}".format(content_type or "file", size_text)
+
+    def _sticker_format(self, sticker):
+        sticker_format = getattr(sticker, "format", None)
+        return (
+            getattr(sticker_format, "name", None)
+            or getattr(sticker_format, "file_extension", None)
+            or "sticker"
+        )
 
     def _formatted_author(self, member):
         name = escape(self.client.format_author(member))

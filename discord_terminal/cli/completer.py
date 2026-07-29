@@ -11,6 +11,9 @@ class DiscordCompleter(Completer):
     def get_completions(self, document, complete_event):
         text = document.text_before_cursor.lstrip()
 
+        if self._matches_prefix(text, "quick_go"):
+            yield from self._complete_quick_go(text)
+            return
         if self._matches_prefix(text, "server_nav"):
             yield from self._complete_guild(text)
             return
@@ -30,6 +33,9 @@ class DiscordCompleter(Completer):
             return
         if self._matches_prefix(text, "edit"):
             yield from self._complete_edit(text)
+            return
+        if self._matches_prefix(text, "voice_join"):
+            yield from self._complete_voice(text)
             return
 
         if text.startswith(":"):
@@ -75,6 +81,16 @@ class DiscordCompleter(Completer):
         for guild in self.client.guilds:
             if guild.name.lower().startswith(partial.lower()):
                 yield Completion(guild.name, start_position=-len(partial))
+
+    def _complete_quick_go(self, text):
+        prefix = self._matched_prefix(text, "quick_go")
+        partial = text[len(prefix):]
+        for entry in self.client.quick_go.search(partial):
+            yield Completion(
+                entry["label"],
+                display=entry["label"],
+                start_position=-len(partial),
+            )
 
     def _complete_channel(self, text):
         prefix = self._prefix("channel_nav")
@@ -129,6 +145,16 @@ class DiscordCompleter(Completer):
             if len(parts) == 1 or parts[1] == "":
                 yield Completion(original, start_position=0, display=original)
 
+    def _complete_voice(self, text):
+        prefix = self._matched_prefix(text, "voice_join")
+        partial = text[len(prefix):]
+        for channel in self.client.voice.channels():
+            if partial.lower() in channel.name.lower():
+                yield Completion(
+                    channel.name,
+                    start_position=-len(partial),
+                )
+
     def _prefix(self, command_name):
         aliases = self.config.aliases(command_name)
         if not aliases:
@@ -141,6 +167,18 @@ class DiscordCompleter(Completer):
                 "{}{} ".format(self.config.command_key, alias)
             )
             for alias in self.config.aliases(command_name)
+        )
+
+    def _matched_prefix(self, text, command_name):
+        return next(
+            (
+                "{}{} ".format(self.config.command_key, alias)
+                for alias in self.config.aliases(command_name)
+                if text.startswith(
+                    "{}{} ".format(self.config.command_key, alias)
+                )
+            ),
+            "",
         )
 
     def _emoji_aliases(self):

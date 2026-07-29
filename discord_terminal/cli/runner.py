@@ -17,10 +17,15 @@ class CliRunner:
         self.style = Style.from_dict(self.config.get("colorInput", default={}))
         self.session = PromptSession(
             completer=DiscordCompleter(client, config),
-            lexer=CommandLexer(config.command_key),
+            lexer=CommandLexer(config),
             style=self.style,
+            bottom_toolbar=self.client.typing.toolbar,
         )
+        self.session.default_buffer.on_text_changed += self._input_changed
         self.client.input_session = self.session
+
+    def _input_changed(self, buffer):
+        self.client.typing.input_changed(buffer.text)
 
     async def run(self):
         self.ui.clear()

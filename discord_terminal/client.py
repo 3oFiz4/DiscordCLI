@@ -2,9 +2,14 @@ import discord
 
 from discord_terminal.services.audio import AudioService
 from discord_terminal.services.bookmarks import BookmarkService
+from discord_terminal.services.downloads import DownloadService
 from discord_terminal.services.images import ImagePreviewService
 from discord_terminal.services.notifications import NotificationService
+from discord_terminal.services.quick_go import QuickGoService
+from discord_terminal.services.typing import TypingService
 from discord_terminal.services.uploads import UploadService
+from discord_terminal.services.voice import VoiceService
+from discord_terminal.services.voice_notes import VoiceNoteService
 from discord_terminal.storage import RecordStore
 from discord_terminal.ui.file_picker import FilePicker
 from discord_terminal.ui.renderer import HistoryRenderer
@@ -29,8 +34,17 @@ class DiscordTerminalClient(discord.Client):
             "whoami": lambda: self.format_author(self.user) if self.user else "unknown"
         }
         self.uploads = UploadService(paths.upload, FilePicker())
+        self.downloads = DownloadService(paths.download)
         self.audio = AudioService(paths.ringtone, config, ui)
         self.image_previewer = ImagePreviewService(paths.preview, ui)
+        self.quick_go = QuickGoService(self)
+        self.typing = TypingService(self, config)
+        self.voice = VoiceService(self)
+        self.voice_notes = VoiceNoteService(
+            self,
+            paths.voice_note,
+            FilePicker(),
+        )
         self.bookmarks = BookmarkService(
             RecordStore(paths.bookmarks, "bookmarks")
         )
@@ -67,6 +81,16 @@ class DiscordTerminalClient(discord.Client):
             and message.channel.id == self.current_channel.id
         ):
             await self.refresh_history(live=True)
+
+    async def on_typing(self, channel, user, when):
+        self.typing.mark(channel, user)
+
+    async def close(self):
+        try:
+            await self.voice.leave()
+        except Exception:
+            pass
+        await super().close()
 
     def format_author(self, member):
         user_id = getattr(member, "id", "?")

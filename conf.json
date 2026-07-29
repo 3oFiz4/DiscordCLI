@@ -4,6 +4,8 @@
     "show_displayname": true,
     "show_username": true,
     "role_based_username_color": true,
+    "incoming_typing_indicator": true,
+    "outgoing_typing_indicator": true,
     "timezone": "Asia/Makassar",
     "notification_scan": {
       "enabled": true,
@@ -20,7 +22,8 @@
   "folders": {
     "upload": "upload",
     "ringtone": "ringtone",
-    "data": "data"
+    "data": "data",
+    "download": "download"
   },
   "file": {
     "account": "token.txt"
@@ -56,7 +59,8 @@
       "message_header_reply": "{index}->[#ff0000]{replied_index}[/] {timestamp} {author}",
       "message_header_reply_to_self": "[reply_to_self]{index}@{replied_index} {timestamp} {author}{indicator}[/reply_to_self]",
       "reply_to_self_indicator": "!",
-      "attachment": "[attachment]|- {attaches}[/attachment]"
+      "attachment": "[attachment]|- {attaches}[/attachment]",
+      "sticker": "[sticker]| Sticker {stickers}[/sticker]"
     }
   },
   "commands": {
@@ -69,13 +73,29 @@
     "changelog": {
       "aliases": ["changelog"],
       "logs": {
-        "content": "[purple]v26.07.29\n    - Structured OOP package\n    - Chafa iTerm image preview\n    - Reply-to-you indicator\n    - Role-based username color option\n    - Persistent startup notifications\n    - Synchronized local timestamps\n    - Topmost upload picker\n    - Message bookmarks\n    - Per-channel notification sounds[/purple]"
+        "content": "[purple]v26.07.29\n    - Quick Go channel and DM search\n    - Live valid-command underline lexer\n    - Discord voice-note sending\n    - Sticker display and terminal preview\n    - Any-file upload and download\n    - Voice-channel join, move, status, and leave\n    - Incoming and outgoing typing indicators\n    - Structured OOP package\n    - Chafa iTerm image preview\n    - Reply-to-you indicator\n    - Role-based username color option\n    - Persistent startup notifications\n    - Synchronized local timestamps\n    - Topmost upload picker\n    - Message bookmarks\n    - Per-channel notification sounds[/purple]"
       }
     },
     "help": {
       "aliases": ["h", "help"],
       "logs": {
-        "content": "[purple]\nHow to Use\n\nNavigation\n    -s <server>\n        Select a Discord server.\n        Example: -s My Server\n\n    -c <channel>\n        Select a text channel from the current server.\n        You must select a server with -s first.\n        Example: -c general\n\n    -cf <username>\n        Open a direct-message conversation with a user.\n        Example: -cf username\n\n    -<\n        Show older messages from the current channel.\n\n    ->\n        Return toward newer messages.\n\nMessages\n    <text>\n        Send text directly to the currently selected channel.\n        Example: Hello everyone\n\n    -r <message no.> <text>\n        Reply to a message. Staged uploads are included.\n        Example: -r 2 I agree with this\n\n    -e <message no.> <new text>\n        Edit one of your messages.\n        Running it without new text fills the input with the original message.\n        Example: -e 1 Corrected message\n\n    -d <message no. ...>\n        Delete one or more of your messages.\n        Example: -d 1\n        Example: -d 1 3 5\n\n    -fw <message no.> <username>\n        Forward the text of a message to a user's DM.\n        Example: -fw 3 username\n\n    -y <message no.>\n        Copy a message to the clipboard.\n        Example: -y 4\n\n    -p <message no.>\n        Pin a message when you have permission.\n        Example: -p 2\n\n    -dp <message no.>\n        Unpin a message when you have permission.\n        Example: -dp 2\n\n    -ct <message no.> <emoji>\n        Add a reaction to a message.\n        Emoji aliases such as :sob: are supported.\n        Example: -ct 5 :sob:\n\n    @<username>\n        Mention a member from the current server.\n        Typing @ opens username completion.\n\n    :<emoji name>\n        Search for an emoji using autocomplete.\n        Example: :thumbs_up:\n\nUploads and Attachments\n    -up\n        Open the file-selection window above other windows and stage files.\n        Staged files are sent with the next normal message or reply.\n\n    -deup\n        Remove all currently staged uploads.\n\n    -open <message no.> [attachment no. ...]\n        Download and open attachments from a message.\n        Without attachment numbers, every attachment is opened.\n        Example: -open 2\n        Example: -open 2 1 3\n\n    -v <message no.> <image no.>\n        Preview an image attachment inside WezTerm using Chafa's iTerm format.\n        Example: -v 2 1\n\n        While viewing:\n            Enter or r    Redraw after resizing the terminal\n            -<            Close the preview and move to older history\n            ->            Close the preview and move to newer history\n            q             Close the preview\n\nNotifications\n    -ntf\n    -notif\n        Show stored notifications, including mentions discovered since the previous startup.\n        Direct messages are treated as notifications automatically.\n\n    -gntf <notification no.>\n    -gonotif <notification no.>\n        Open the channel containing a notification.\n        Example: -gntf 1\n\nBookmarks\n    -bm <message no.>\n        Save a message as a persistent bookmark.\n        Example: -bm 3\n\n    -bms\n        Show all saved bookmarks.\n\n    -gbm <bookmark no.>\n        Open the channel and history around a bookmarked message.\n        Example: -gbm 1\n\n    -dbm <bookmark no.>\n        Delete a bookmark from the bookmark list.\n        Example: -dbm 1\n\nMiscellaneous\n    -changelog\n        Show the application changelog.\n\n    -conf\n        Open the configuration command placeholder.\n        The interactive configuration editor is not finished yet.\n\n    -h\n    -help\n        Show this help page.\n\n    -q\n    -quit\n    -exit\n        Close the Discord terminal client.\n[/purple]"
+        "content": "[purple]Quick Go and navigation:\n    -k <query>                  Search every text channel and DM, then go directly when one result matches.\n    -k <result no.>             Open a numbered result from the last Quick Go search.\n    -s <server name>            Select a server. Type the start of its name for completion.\n    -c <channel name>           Open a text channel in the selected server.\n    -cf <username>              Open a direct-message conversation.\n    -<                          Show the next older page of chat history.\n    ->                          Show the next newer page of chat history.\n\nMessages:\n    -r <message no.> <text>     Reply to a displayed message. Staged files are included.\n    -e <message no.> <text>     Edit one of your messages. Omit text to load it into the input.\n    -d <message no. ...>        Delete one or more of your displayed messages.\n    -fw <message no.> <user>    Forward the text of a message to a direct-message user.\n    -y <message no.>            Copy a message's text to the clipboard.\n    -p <message no.>            Pin a message.\n    -dp <message no.>           Unpin a message.\n    -ct <message no.> <emoji>   Add a reaction using an emoji or emoji alias.\n\nFiles, images, stickers, and voice notes:\n    -up                         Open a topmost picker and stage any file for the next message or reply.\n    -deup                       Remove every currently staged upload.\n    -dw <message no.>           Download every attachment from a message into the download folder.\n    -dw <message no.> <no. ...> Download only the selected attachment numbers.\n    -open <message no.> <no. ...> Save and open selected attachments with the operating system.\n    -v <message no.> <image no.> Preview an image attachment using Chafa iTerm symbols.\n    -v <message no.> s<no.>     Preview a PNG, APNG, or GIF sticker; Lottie stickers are identified but cannot be rendered by Chafa.\n    -vn                         Pick audio, convert it, and send it as a Discord voice note.\n    -vn <audio path>            Send the specified audio file as a Discord voice note. Requires ffmpeg and ffprobe in PATH.\n\nVoice channels:\n    -vc                         List voice channels in the selected server.\n    -vc <channel name or ID>    Join a voice channel, or move there when already connected.\n    -vcs                        Show the current voice-channel connection.\n    -lvc                        Leave the current voice channel.\n\nTyping indicators:\n    -typing                     Show whether your outgoing typing signal is enabled.\n    -typing on                  Send Discord typing events while composing a normal message.\n    -typing off                 Stop sending your typing events. Incoming typing remains visible below the prompt.\n\nNotifications:\n    -ntf                        List stored pings and direct messages found since the previous session.\n    -gntf <notification no.>    Open the channel and message belonging to a notification.\n\nBookmarks:\n    -bm <message no.>           Save a displayed message as a bookmark.\n    -bms                        List saved bookmarks.\n    -dbm <bookmark no.>         Delete a bookmark from the list.\n    -gbm <bookmark no.>         Open the channel and message belonging to a bookmark.\n\nOther:\n    -help                       Show this full command reference.\n    -changelog                  Show the feature changelog.\n    -conf                       Show the current reserved configuration-editor status.\n    -q                          Close the client.[/purple]"
+      }
+    },
+    "quick_go": {
+      "aliases": ["k"],
+      "logs": {
+        "results": "[i]Quick Go matches:[/i]",
+        "choose": "[i]Run -k <result no.>, or keep typing after -k to narrow the search.[/i]",
+        "not_found": "[e]No Quick Go destination matches: {query}[/e]"
+      }
+    },
+    "typing_indicator": {
+      "aliases": ["typing", "ti"],
+      "logs": {
+        "enabled": "[o]Outgoing typing indicator enabled.[/o]",
+        "disabled": "[i]Outgoing typing indicator disabled.[/i]",
+        "status": "[i]Outgoing typing indicator is {state}.[/i]"
       }
     },
     "server_nav": {
@@ -162,6 +182,52 @@
         "reset": "[o]Upload reset.[/o]"
       }
     },
+    "download_attachment": {
+      "aliases": ["dw"],
+      "logs": {
+        "usage": "[e]Usage: -dw <message no.> <attachment no. ...>[/e]",
+        "message_out_of_range": "[e]Message index is out of range.[/e]",
+        "no_attachments": "[i]That message has no downloadable attachments.[/i]",
+        "attachment_out_of_range": "[e]Attachment index {index} is out of range.[/e]",
+        "saved": "[o]Downloaded: {path}[/o]",
+        "error": "[e]Download failed: {error_msg}[/e]"
+      }
+    },
+    "voice_note": {
+      "aliases": ["vn"],
+      "logs": {
+        "no_channel": "[e]Open a text channel or DM before sending a voice note.[/e]",
+        "sent": "[o]Voice note sent.[/o]",
+        "error": "[e]Voice note failed: {error_msg}[/e]"
+      }
+    },
+    "voice_join": {
+      "aliases": ["vc"],
+      "logs": {
+        "no_server": "[e]Select a server before joining voice.[/e]",
+        "none": "[i]This server has no voice channels.[/i]",
+        "available": "[i]Available voice channels:[/i]",
+        "usage": "[i]Usage: -vc <channel name or ID>[/i]",
+        "not_found": "[e]Voice channel not found: {name}[/e]",
+        "joined": "[o]Connected to voice channel: {name}[/o]",
+        "error": "[e]Voice connection failed: {error_msg}[/e]"
+      }
+    },
+    "voice_leave": {
+      "aliases": ["lvc"],
+      "logs": {
+        "left": "[o]Left the voice channel.[/o]",
+        "not_connected": "[i]Not connected to a voice channel.[/i]",
+        "error": "[e]Could not leave voice: {error_msg}[/e]"
+      }
+    },
+    "voice_status": {
+      "aliases": ["vcs"],
+      "logs": {
+        "connected": "[o]Voice connected: {name}[/o]",
+        "disconnected": "[i]Voice is disconnected.[/i]"
+      }
+    },
     "dm_nav": {
       "aliases": ["cf"],
       "logs": {
@@ -214,7 +280,7 @@
     "image_preview": {
       "aliases": ["v"],
       "logs": {
-        "usage": "[e]Usage: -v <message no.> <image no.>[/e]",
+        "usage": "[e]Usage: -v <message no.> <image no.>, or -v <message no.> s<sticker no.>[/e]",
         "out_of_range": "[e]Message or image index is out of range.[/e]",
         "error": "[e]Image preview failed: {error_msg}[/e]"
       }

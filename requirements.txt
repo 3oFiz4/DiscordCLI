@@ -4,3 +4,4 @@ emoji
 playsound3
 prompt_toolkit
 rich
+discord.py-self[voice]>=2.1.0

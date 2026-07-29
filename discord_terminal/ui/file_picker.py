@@ -4,7 +4,7 @@ from tkinter import filedialog
 
 
 class FilePicker:
-    def pick(self):
+    def pick(self, title="Choose file to Upload. Any types.", filetypes=None):
         root = tkinter.Tk()
         root.withdraw()
         root.attributes("-topmost", True)
@@ -13,7 +13,8 @@ class FilePicker:
         root.update()
         paths = filedialog.askopenfilenames(
             parent=root,
-            title="Choose file to Upload. Any types.",
+            title=title,
+            filetypes=filetypes,
         )
         root.update()
         root.destroy()

@@ -2,15 +2,36 @@ from prompt_toolkit.lexers import Lexer
 
 
 class CommandLexer(Lexer):
-    def __init__(self, command_key):
-        self.command_key = command_key
+    def __init__(self, config):
+        self.config = config
+        self.command_key = config.command_key
+        self.valid_commands = {
+            "{}{}".format(self.command_key, alias)
+            for command in config.commands.values()
+            for alias in command.get("aliases", [])
+        }
 
     def lex_document(self, document):
-        text = document.text
+        lines = document.lines
 
         def get_line(lineno):
-            if text.lstrip().startswith(self.command_key):
-                return [("class:command", text)]
+            text = lines[lineno]
+            stripped = text.lstrip()
+            if stripped.startswith(self.command_key):
+                padding = text[:len(text) - len(stripped)]
+                token, separator, remaining = stripped.partition(" ")
+                style = (
+                    "class:command.valid"
+                    if token in self.valid_commands
+                    else "class:command"
+                )
+                fragments = []
+                if padding:
+                    fragments.append(("class:default", padding))
+                fragments.append((style, token))
+                if separator:
+                    fragments.append(("class:command", separator + remaining))
+                return fragments
             return [("class:default", text)]
 
         return get_line

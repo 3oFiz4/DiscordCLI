@@ -9,8 +9,14 @@ from discord_terminal.commands.base import CommandHandler
 
 class MediaCommands(CommandHandler):
     async def handle(self, text):
+        if self.matches(text, "voice_note"):
+            await self._voice_note(text)
+            return True
         if self.matches(text, "image_preview"):
             await self._preview(text)
+            return True
+        if self.matches(text, "download_attachment"):
+            await self._download(text)
             return True
         if self.matches(text, "open_attachment"):
             await self._open(text)
@@ -26,17 +32,36 @@ class MediaCommands(CommandHandler):
 
     async def _preview(self, text):
         parts = self.arguments(text, "image_preview").split()
-        if len(parts) != 2 or not all(part.isdigit() for part in parts):
+        if (
+            len(parts) != 2
+            or not parts[0].isdigit()
+            or not (
+                parts[1].isdigit()
+                or (
+                    parts[1].lower().startswith("s")
+                    and parts[1][1:].isdigit()
+                )
+            )
+        ):
             self.log("image_preview", "usage")
             return
         try:
             message = self.client.message_at(int(parts[0]))
-            image_index = int(parts[1])
-            if image_index < 1 or image_index > len(message.attachments):
-                raise IndexError
-            action = await self.client.image_previewer.preview(
-                message.attachments[image_index - 1]
-            )
+            if parts[1].lower().startswith("s"):
+                sticker_index = int(parts[1][1:])
+                stickers = getattr(message, "stickers", [])
+                if sticker_index < 1 or sticker_index > len(stickers):
+                    raise IndexError
+                action = await self.client.image_previewer.preview_sticker(
+                    stickers[sticker_index - 1]
+                )
+            else:
+                image_index = int(parts[1])
+                if image_index < 1 or image_index > len(message.attachments):
+                    raise IndexError
+                action = await self.client.image_previewer.preview(
+                    message.attachments[image_index - 1]
+                )
             if action == "-<":
                 self.client.scroll_older()
             elif action == "->":
@@ -46,6 +71,63 @@ class MediaCommands(CommandHandler):
             self.log("image_preview", "out_of_range")
         except Exception as error:
             self.log("image_preview", "error", error_msg=str(error))
+
+    async def _voice_note(self, text):
+        if not self.client.current_channel:
+            self.log("voice_note", "no_channel")
+            return
+        source = self.arguments(text, "voice_note").strip()
+        try:
+            await self.client.voice_notes.send(
+                self.client.current_channel,
+                source,
+            )
+            self.log("voice_note", "sent")
+            await self.client.refresh_history()
+        except Exception as error:
+            self.log("voice_note", "error", error_msg=str(error))
+
+    async def _download(self, text):
+        parts = self.arguments(text, "download_attachment").split()
+        if not parts or not parts[0].isdigit():
+            self.log("download_attachment", "usage")
+            return
+        try:
+            message = self.client.message_at(int(parts[0]))
+        except Exception:
+            self.log("download_attachment", "message_out_of_range")
+            return
+        if not message.attachments:
+            self.log("download_attachment", "no_attachments")
+            return
+        indices = [
+            int(value)
+            for value in parts[1:]
+            if value.isdigit()
+        ] or list(range(1, len(message.attachments) + 1))
+        for index in indices:
+            if index < 1 or index > len(message.attachments):
+                self.log(
+                    "download_attachment",
+                    "attachment_out_of_range",
+                    index=index,
+                )
+                continue
+            try:
+                path = await self.client.downloads.save(
+                    message.attachments[index - 1]
+                )
+                self.log(
+                    "download_attachment",
+                    "saved",
+                    path=str(path),
+                )
+            except Exception as error:
+                self.log(
+                    "download_attachment",
+                    "error",
+                    error_msg=str(error),
+                )
 
     async def _open(self, text):
         parts = self.arguments(text, "open_attachment").split()
