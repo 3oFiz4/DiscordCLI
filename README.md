@@ -1,12 +1,12 @@
-![Preview](https://github.com/user-attachments/assets/8067db4a-0f02-457f-b6ef-3897aefdb14f)
 # DiscordCLI
 > A Discord terminal client built in ~4 hours (initially). Functional: message, reply, upload — all from the command line.
-<img width="786" height="508" alt="image" src="https://github.com/user-attachments/assets/a590052d-c0b2-41b0-8a82-ab058bb18726" />
-
----
 
 ## Thumbnail
 ![Banner](https://github.com/user-attachments/assets/e072021d-ab9c-4edd-beb6-d38d19f75b51)
+<img width="786" height="508" alt="image" src="https://github.com/user-attachments/assets/a590052d-c0b2-41b0-8a82-ab058bb18726" />
+<img width="820" height="591" alt="image" src="https://github.com/user-attachments/assets/74c56898-eb3e-469a-8deb-8b74b9ea5d0c" />
+
+https://github.com/user-attachments/assets/cc444e3c-075d-4ce1-9027-d3affa691461
 
 ---
 
@@ -17,7 +17,7 @@ This client acts like a **selfbot**, and using it **violates Discord's TOS**.
 You **may get banned**.  
 I am **not responsible** for any account loss.  
 
-✅ Use an **alt account**, or use within a proper **Discord Bot** context.
+Use an **alt account**, or use within a proper **Discord Bot** context.
 
 ---
 
