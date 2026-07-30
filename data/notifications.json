@@ -95,6 +95,30 @@
       "content": "engak",
       "created_at": "2026-07-29T13:18:38.251000+00:00",
       "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1532014491603173396"
+    },
+    {
+      "message_id": "1532205744936583238",
+      "channel_id": "1481167719947833349",
+      "channel": "admin",
+      "guild_id": "1481167718693732354",
+      "guild": "PKI - Pasukan Kucing Indonesia",
+      "author_id": "1144948748884136006",
+      "author": "justlezian_77247",
+      "content": "Ohhh,, mungkin aku akan ngeles. Karena ini berdasarkan penelitian sebelumnya sih jor",
+      "created_at": "2026-07-30T01:58:36.599000+00:00",
+      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833349/1532205744936583238"
+    },
+    {
+      "message_id": "1532206530307428502",
+      "channel_id": "1481167719947833349",
+      "channel": "admin",
+      "guild_id": "1481167718693732354",
+      "guild": "PKI - Pasukan Kucing Indonesia",
+      "author_id": "1144948748884136006",
+      "author": "justlezian_77247",
+      "content": "Mungkin itu bisa menjadi untuk ekperimen berikutnya,, karena itu bisa bergantung apakah model itu benar² lebih baik dari penelitian sebelumnya... Jadi aku gabisa katakan bahwa GAN pasti lebih baik dari GCN",
+      "created_at": "2026-07-30T02:01:43.846000+00:00",
+      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833349/1532206530307428502"
     }
   ]
 }

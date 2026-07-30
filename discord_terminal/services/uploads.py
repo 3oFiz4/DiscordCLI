@@ -15,8 +15,11 @@ class UploadService:
             return []
         self.reset()
         for path in picked:
+            if not path.is_file():
+                continue
             destination = self.upload_dir / path.name
-            shutil.copy2(path, destination)
+            if path.resolve() != destination.resolve():
+                shutil.copy2(path, destination)
             self.staged.append(destination)
         return list(self.staged)
 
