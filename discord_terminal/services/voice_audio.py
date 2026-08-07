@@ -158,6 +158,7 @@ class VoiceAudioBridge:
             source,
             application="voip",
             signal_type="voice",
+            expected_packet_loss=0.15,
         )
         destination = native_module.BasicSink(
             self._receive,
@@ -269,15 +270,21 @@ class VoiceAudioBridge:
         size = frames * 4
         try:
             payload = self.mixer.mix(size)
-            outdata[:] = payload
-            if any(payload):
-                self.played_bytes += len(payload)
         except Exception as error:
-            outdata[:] = bytes(size)
+            payload = bytes(size)
             self.last_error = "{}: {}".format(
                 type(error).__name__,
                 error,
             )
+        try:
+            if hasattr(outdata, "view"):
+                outdata.view("uint8").reshape(-1)[:] = memoryview(payload)
+            else:
+                outdata[:] = payload
+            if any(payload):
+                self.played_bytes += len(payload)
+        except Exception:
+            pass
 
     def speaking_ids(self):
         return self.mixer.speaking_ids()

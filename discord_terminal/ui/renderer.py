@@ -109,12 +109,14 @@ class HistoryRenderer:
 
         content = escape(message.content or "")
         if "\n" in message.content:
+            rule_style = self.config.get("pallete", "line_break", default="green")
             self.ui.print(header)
-            self.ui.rule()
+            self.ui.rule(style=rule_style)
             self.ui.print(content)
-            self.ui.rule()
+            self.ui.rule(style=rule_style)
         else:
             self.ui.print("{} {}".format(header, content))
+
 
         if message.attachments:
             attachments = " ".join(

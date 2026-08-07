@@ -11,8 +11,12 @@ class TerminalUI:
         self.console.print(value, **kwargs)
 
 
-    def rule(self):
-        self.console.rule()
+    def rule(self, title="", style=None):
+        if style:
+            self.console.rule(title, style=style)
+        else:
+            self.console.rule(title)
+
 
     def clear(self):
         self.console.clear()

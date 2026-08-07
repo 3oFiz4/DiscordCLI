@@ -19,13 +19,38 @@ class CliRunner:
             completer=DiscordCompleter(client, config),
             lexer=CommandLexer(config),
             style=self.style,
-            bottom_toolbar=self.client.typing.toolbar,
+            bottom_toolbar=self._toolbar,
         )
         self.session.default_buffer.on_text_changed += self._input_changed
         self.client.input_session = self.session
 
+    def _toolbar(self):
+        fragments = []
+        typing_fragments = self.client.typing.toolbar()
+        if typing_fragments:
+            fragments.extend(typing_fragments)
+
+        text = self.session.default_buffer.text
+        if text and not text.lstrip().startswith(self.config.command_key):
+            ptype = self.client.get_premium_type()
+            max_limit = self.client.get_max_message_length()
+            text_len = len(text)
+            if text_len > max_limit:
+                if fragments:
+                    fragments.append(("class:default", " | "))
+                fragments.append(
+                    (
+                        "class:command",
+                        f"EXCEEDS MAX MSG LIMIT ({text_len}/{max_limit}) [Nitro: {ptype}]",
+                    )
+                )
+        return fragments
+
     def _input_changed(self, buffer):
         self.client.typing.input_changed(buffer.text)
+        if hasattr(self.session, "app") and self.session.app:
+            self.session.app.invalidate()
+
 
     async def run(self):
         self.ui.clear()

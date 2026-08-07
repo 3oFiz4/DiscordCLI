@@ -32,6 +32,40 @@ class MediaCommands(CommandHandler):
 
     async def _preview(self, text):
         parts = self.arguments(text, "image_preview").split()
+        if len(parts) == 1 and parts[0].startswith(":") and parts[0].endswith(":"):
+            emoji_name = parts[0]
+            emoji = self.client.get_custom_emoji_by_name(emoji_name)
+            if not emoji:
+                self.log("image_preview", "emoji_not_found", name=emoji_name)
+                return
+            try:
+                action = await self.client.image_previewer.preview_emoji(emoji)
+                if action == "-<":
+                    self.client.scroll_older()
+                elif action == "->":
+                    self.client.scroll_newer()
+                await self.client.render_history()
+            except Exception as error:
+                self.log("image_preview", "error", error_msg=str(error))
+            return
+
+        if len(parts) == 2 and parts[1].startswith(":") and parts[1].endswith(":"):
+            emoji_name = parts[1]
+            emoji = self.client.get_custom_emoji_by_name(emoji_name)
+            if not emoji:
+                self.log("image_preview", "emoji_not_found", name=emoji_name)
+                return
+            try:
+                action = await self.client.image_previewer.preview_emoji(emoji)
+                if action == "-<":
+                    self.client.scroll_older()
+                elif action == "->":
+                    self.client.scroll_newer()
+                await self.client.render_history()
+            except Exception as error:
+                self.log("image_preview", "error", error_msg=str(error))
+            return
+
         if (
             len(parts) != 2
             or not parts[0].isdigit()
@@ -45,6 +79,7 @@ class MediaCommands(CommandHandler):
         ):
             self.log("image_preview", "usage")
             return
+
         try:
             message = self.client.message_at(int(parts[0]))
             if parts[1].lower().startswith("s"):

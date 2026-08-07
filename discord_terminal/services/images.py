@@ -33,6 +33,24 @@ class ImagePreviewService:
         path.write_bytes(await sticker.read())
         return await asyncio.to_thread(self._view, path)
 
+    async def preview_emoji(self, emoji):
+        is_animated = getattr(emoji, "animated", False)
+        extension = "gif" if is_animated else "png"
+        filename = f"emoji_{emoji.id}_{emoji.name}.{extension}"
+        path = self.preview_dir / filename
+
+        if not path.exists():
+            if hasattr(emoji, "save"):
+                await emoji.save(path)
+            elif hasattr(emoji, "read"):
+                path.write_bytes(await emoji.read())
+            elif hasattr(emoji, "url"):
+                import urllib.request
+                await asyncio.to_thread(urllib.request.urlretrieve, str(emoji.url), path)
+
+        return await asyncio.to_thread(self._view, path)
+
+
     def _view(self, path):
         executable = shutil.which("chafa")
         if not executable:

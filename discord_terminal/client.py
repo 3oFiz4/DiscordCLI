@@ -167,6 +167,85 @@ class DiscordTerminalClient(discord.Client):
         self.history_offset = 0
         await self.render_history(live=live)
 
+    def get_premium_type(self):
+        try:
+            user = self.user
+        except Exception:
+            user = None
+        if not user:
+            return "none"
+        premium = getattr(user, "premium_type", None)
+        if premium is None:
+            return "none"
+        if hasattr(premium, "name"):
+            name = str(premium.name).lower()
+            if name in ("nitro", "nitro_classic", "nitro_basic", "none"):
+                return name
+        try:
+            val = int(premium) if isinstance(premium, int) else getattr(premium, "value", 0)
+        except Exception:
+            val = 0
+        if val == 2:
+            return "nitro"
+        elif val == 1:
+            return "nitro_classic"
+        elif val == 3:
+            return "nitro_basic"
+        return "none"
+
+    def get_max_message_length(self):
+        ptype = self.get_premium_type()
+        if ptype == "nitro":
+            return 4000
+        return 2000
+
+    def get_custom_emoji_by_name(self, name):
+        clean_name = name.strip(":").lower()
+        has_nitro = self.get_premium_type() != "none"
+        current_guild = getattr(self, "current_guild", None)
+
+        if current_guild and hasattr(current_guild, "emojis"):
+            for emoji in current_guild.emojis:
+                if emoji.name.lower() == clean_name:
+                    return emoji
+
+        try:
+            all_emojis = getattr(self, "emojis", [])
+        except Exception:
+            all_emojis = []
+
+        for emoji in all_emojis:
+            if emoji.name.lower() == clean_name:
+                return emoji
+
+        return None
+
+    def get_available_custom_emojis(self):
+        has_nitro = self.get_premium_type() != "none"
+        emojis = []
+        seen_ids = set()
+
+        current_guild = getattr(self, "current_guild", None)
+        if current_guild and hasattr(current_guild, "emojis"):
+            for emoji_obj in current_guild.emojis:
+                if emoji_obj.id not in seen_ids:
+                    seen_ids.add(emoji_obj.id)
+                    emojis.append(emoji_obj)
+
+        if has_nitro:
+            try:
+                all_emojis = getattr(self, "emojis", [])
+            except Exception:
+                all_emojis = []
+            for emoji_obj in all_emojis:
+                if emoji_obj.id not in seen_ids:
+                    seen_ids.add(emoji_obj.id)
+                    emojis.append(emoji_obj)
+
+        return emojis
+
+
+
     async def render_history(self, live=False):
         await self.renderer.render(live=live)
 
@@ -175,6 +254,17 @@ class DiscordTerminalClient(discord.Client):
             self.ui.print(
                 self.config.log("message_send", "no_channel_selected")
             )
+            return
+        ptype = self.get_premium_type()
+        max_limit = self.get_max_message_length()
+        if len(content) > max_limit:
+            log_tmpl = self.config.log("message_send", "max_length_exceeded")
+            msg = (
+                log_tmpl.format(length=len(content), max_limit=max_limit, ptype=ptype)
+                if log_tmpl
+                else f"[e]EXCEEDS MAX MESSAGE LIMIT: {len(content)}/{max_limit} characters (Nitro: {ptype})[/e]"
+            )
+            self.ui.print(msg)
             return
         try:
             await self.current_channel.send(
@@ -189,6 +279,7 @@ class DiscordTerminalClient(discord.Client):
                     error_msg=str(error)
                 )
             )
+
 
     async def go_to_record(self, record):
         channel_id = int(record["channel_id"])

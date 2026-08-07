@@ -38,29 +38,75 @@ class DiscordCompleter(Completer):
             yield from self._complete_voice(text)
             return
 
-        if text.startswith(":"):
-            prefix = text[1:]
-            for emoji_code in self.emoji_aliases:
-                core = emoji_code.strip(":")
-                if core.lower().startswith(prefix.lower()):
-                    character = emoji.emojize(
-                        emoji_code,
-                        language="alias",
-                        variant="emoji_type",
-                    )
+        words = text.split(" ")
+        if words:
+            last_word = words[-1]
+            if last_word.startswith(":") and not (len(last_word) > 1 and last_word.endswith(":") and last_word.count(":") >= 2):
+                prefix = last_word[1:]
+                for emoji_code in self.emoji_aliases:
+                    core = emoji_code.strip(":")
+                    if core.lower().startswith(prefix.lower()):
+                        try:
+                            character = emoji.emojize(
+                                emoji_code,
+                                language="alias",
+                            )
+                        except Exception:
+                            character = ""
+                        display = "{} {}".format(character, emoji_code).strip()
+                        yield Completion(
+                            emoji_code,
+                            display=display,
+                            start_position=-len(prefix) - 1,
+                        )
+
+                if hasattr(self.client, "get_available_custom_emojis"):
+                    is_v_command = self._matches_prefix(text, "image_preview")
+                    custom_emojis = self.client.get_available_custom_emojis()
+                    for c_emoji in custom_emojis:
+                        c_name = getattr(c_emoji, "name", "")
+                        if c_name.lower().startswith(prefix.lower()):
+                            if is_v_command:
+                                plain_code = f":{c_name}:"
+                                yield Completion(
+                                    plain_code,
+                                    display=plain_code,
+                                    start_position=-len(prefix) - 1,
+                                )
+                            else:
+                                tag = "a" if getattr(c_emoji, "animated", False) else ""
+                                template = f"<{tag}:{c_name}:{c_emoji.id}>"
+                                display = f":{c_name}: ({template})"
+                                yield Completion(
+                                    template,
+                                    display=display,
+                                    start_position=-len(prefix) - 1,
+                                )
+                return
+
+
+
+
+        last_word = text.split(" ")[-1]
+        if "@" in last_word:
+            partial = last_word.split("@")[-1]
+            members = self._get_mentionable_members()
+            for user in members:
+                name = getattr(user, "name", "")
+                display_name = getattr(user, "display_name", name)
+                nick = getattr(user, "nick", None)
+                matches_name = name.lower().startswith(partial.lower())
+                matches_display = display_name.lower().startswith(partial.lower())
+                matches_nick = nick and nick.lower().startswith(partial.lower())
+                if matches_name or matches_display or matches_nick:
+                    display = f"{display_name} (@{name})" if display_name != name else f"@{name}"
                     yield Completion(
-                        emoji_code,
-                        display="{} {}".format(character, emoji_code),
-                        start_position=-len(prefix) - 1,
+                        f"<@{user.id}>",
+                        display=display,
+                        start_position=-len(partial) - 1,
                     )
             return
 
-        if "@" in text.split(" ")[-1] and self.client.current_guild:
-            partial = text.split(" ")[-1].split("@")[-1]
-            for user in self.client.current_guild.members:
-                if user.name.lower().startswith(partial.lower()):
-                    yield Completion(user.name, start_position=-len(partial))
-            return
 
         tokens = text.split()
         if tokens:
@@ -162,12 +208,16 @@ class DiscordCompleter(Completer):
         return "{}{} ".format(self.config.command_key, aliases[0])
 
     def _matches_prefix(self, text, command_name):
-        return any(
-            text.startswith(
-                "{}{} ".format(self.config.command_key, alias)
-            )
-            for alias in self.config.aliases(command_name)
-        )
+        for alias in self.config.aliases(command_name):
+            prefixes = [self.config.command_key]
+            if self.config.command_key != "/":
+                prefixes.append("/")
+            for prefix in prefixes:
+                pfx = "{}{} ".format(prefix, alias)
+                if text.startswith(pfx):
+                    return True
+        return False
+
 
     def _matched_prefix(self, text, command_name):
         return next(
@@ -188,3 +238,17 @@ class DiscordCompleter(Completer):
         for data in emoji.EMOJI_DATA.values():
             aliases.extend(data.get("alias", []))
         return sorted(set(aliases))
+
+    def _get_mentionable_members(self):
+        if self.client.current_guild:
+            return self.client.current_guild.members
+        channel = self.client.current_channel
+        if not channel:
+            return []
+        members = []
+        if hasattr(channel, "recipients") and channel.recipients:
+            members.extend(channel.recipients)
+        elif hasattr(channel, "recipient") and channel.recipient:
+            members.append(channel.recipient)
+        return [m for m in members if m]
+

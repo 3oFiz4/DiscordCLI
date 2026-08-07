@@ -43,12 +43,24 @@ class MessageCommands(CommandHandler):
                 error_msg="Missing message number or content",
             )
             return
+        content = parts[1]
+        max_limit = self.client.get_max_message_length()
+        ptype = self.client.get_premium_type()
+        if len(content) > max_limit:
+            self.log(
+                "reply",
+                "error",
+                error_msg=f"Exceeds character limit ({len(content)}/{max_limit}) for Nitro type '{ptype}'",
+            )
+            return
+
         try:
             target = self.client.message_at(int(parts[0]))
             await target.reply(
-                parts[1],
+                content,
                 files=self.client.uploads.discord_files(),
             )
+
             self.client.uploads.consume()
         except Exception as error:
             self.log("reply", "error", error_msg=str(error))
