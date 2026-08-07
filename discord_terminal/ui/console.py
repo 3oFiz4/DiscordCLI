@@ -7,8 +7,9 @@ class TerminalUI:
     def __init__(self, theme):
         self.console = Console(theme=theme)
 
-    def print(self, value=""):
-        self.console.print(value)
+    def print(self, value="", **kwargs):
+        self.console.print(value, **kwargs)
+
 
     def rule(self):
         self.console.rule()

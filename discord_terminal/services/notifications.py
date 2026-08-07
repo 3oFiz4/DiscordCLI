@@ -16,8 +16,12 @@ class NotificationService:
         return sorted(
             records,
             key=lambda record: record.get("created_at", ""),
-            reverse=True,
+            reverse=False,
         )
+
+    def clear(self):
+        self.store.clear()
+
 
     def is_notification(self, message):
         if message.author == self.client.user:

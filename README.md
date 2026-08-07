@@ -115,6 +115,7 @@ Now you can run `main.py` from anywhere, by running `dc`. This is because of the
 
 ```
 -ntf / -notif       Show notifications
+-cntf / /cntf       Clear all notifications
 -gntf / -gonotif    Jump to notif source
 ->n / -<n           Scroll newest/oldest by n messages
 

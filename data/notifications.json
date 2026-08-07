@@ -1,124 +1,16 @@
 {
   "notifications": [
     {
-      "message_id": "1531979898997047516",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1144948748884136006",
-      "author": "justlezian_77247",
-      "content": "Btww SI kalian udah?? @everyone ???",
-      "created_at": "2026-07-29T11:01:10.731000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1531979898997047516"
-    },
-    {
-      "message_id": "1531980941613076490",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1022817544517726268",
-      "author": "the_soul_of_gods",
-      "content": "apa bedanya sma ayang kemarin?",
-      "created_at": "2026-07-29T11:05:19.310000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1531980941613076490"
-    },
-    {
-      "message_id": "1531981482506059966",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1022817544517726268",
-      "author": "the_soul_of_gods",
-      "content": "jir premium",
-      "created_at": "2026-07-29T11:07:28.269000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1531981482506059966"
-    },
-    {
-      "message_id": "1531984793020010496",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1022817544517726268",
-      "author": "the_soul_of_gods",
-      "content": "nitro beli kah",
-      "created_at": "2026-07-29T11:20:37.557000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1531984793020010496"
-    },
-    {
-      "message_id": "1532000265748746471",
-      "channel_id": "501464482996944909",
-      "channel": "casual-off-topic",
-      "guild_id": "244917432383176705",
-      "guild": "Meditation Mind",
-      "author_id": "940623156232736869",
-      "author": "pinkice645",
-      "content": "Good morning all 🍵 Happy Wednesday !!!\n<@336172724500037632> \n<@319920873362554880>  \n<@443604140896288771> \n<@100246600030392320> \n<@686522020921606262> \n<@1376985748758204466> \n<@762671692430180363> \n<@386013178460372993> \n<@1066318838746054727> \n<@125180864878346240> \n<@1456141221604098101> \n<@290527826279399424> \n<@1303180648411959297> \n<@1511359044940464259> \nEducation is the best provision for life's journey. - Aristotle 🧐",
-      "created_at": "2026-07-29T12:22:06.543000+00:00",
-      "jump_url": "https://discord.com/channels/244917432383176705/501464482996944909/1532000265748746471"
-    },
-    {
-      "message_id": "1532008836414570628",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1022817544517726268",
-      "author": "the_soul_of_gods",
-      "content": "emojinya ke lod jir",
-      "created_at": "2026-07-29T12:56:09.949000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1532008836414570628"
-    },
-    {
-      "message_id": "1532012886057156628",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1022817544517726268",
-      "author": "the_soul_of_gods",
-      "content": "/iya",
-      "created_at": "2026-07-29T13:12:15.459000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1532012886057156628"
-    },
-    {
-      "message_id": "1532014491603173396",
-      "channel_id": "1481167719947833351",
-      "channel": "admin-off-topic",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1022817544517726268",
-      "author": "the_soul_of_gods",
-      "content": "engak",
-      "created_at": "2026-07-29T13:18:38.251000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833351/1532014491603173396"
-    },
-    {
-      "message_id": "1532205744936583238",
-      "channel_id": "1481167719947833349",
-      "channel": "admin",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1144948748884136006",
-      "author": "justlezian_77247",
-      "content": "Ohhh,, mungkin aku akan ngeles. Karena ini berdasarkan penelitian sebelumnya sih jor",
-      "created_at": "2026-07-30T01:58:36.599000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833349/1532205744936583238"
-    },
-    {
-      "message_id": "1532206530307428502",
-      "channel_id": "1481167719947833349",
-      "channel": "admin",
-      "guild_id": "1481167718693732354",
-      "guild": "PKI - Pasukan Kucing Indonesia",
-      "author_id": "1144948748884136006",
-      "author": "justlezian_77247",
-      "content": "Mungkin itu bisa menjadi untuk ekperimen berikutnya,, karena itu bisa bergantung apakah model itu benar² lebih baik dari penelitian sebelumnya... Jadi aku gabisa katakan bahwa GAN pasti lebih baik dari GCN",
-      "created_at": "2026-07-30T02:01:43.846000+00:00",
-      "jump_url": "https://discord.com/channels/1481167718693732354/1481167719947833349/1532206530307428502"
+      "message_id": "1535188333821431840",
+      "channel_id": "1531687305645916202",
+      "channel": "Direct Message with rungoely",
+      "guild_id": null,
+      "guild": null,
+      "author_id": "476101527883218945",
+      "author": "rungoely",
+      "content": "Thanks for offerin'. I wish you enjoyment in your projects.",
+      "created_at": "2026-08-07T07:30:21.203000+00:00",
+      "jump_url": "https://discord.com/channels/@me/1531687305645916202/1535188333821431840"
     }
   ]
 }

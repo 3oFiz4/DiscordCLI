@@ -5,11 +5,11 @@ class CommandLexer(Lexer):
     def __init__(self, config):
         self.config = config
         self.command_key = config.command_key
-        self.valid_commands = {
-            "{}{}".format(self.command_key, alias)
-            for command in config.commands.values()
-            for alias in command.get("aliases", [])
-        }
+        self.valid_commands = set()
+        for command in config.commands.values():
+            for alias in command.get("aliases", []):
+                self.valid_commands.add("{}{}".format(self.command_key, alias))
+                self.valid_commands.add("{}{}".format("/", alias))
 
     def lex_document(self, document):
         lines = document.lines
@@ -17,7 +17,7 @@ class CommandLexer(Lexer):
         def get_line(lineno):
             text = lines[lineno]
             stripped = text.lstrip()
-            if stripped.startswith(self.command_key):
+            if stripped.startswith(self.command_key) or stripped.startswith("/"):
                 padding = text[:len(text) - len(stripped)]
                 token, separator, remaining = stripped.partition(" ")
                 style = (
@@ -33,5 +33,6 @@ class CommandLexer(Lexer):
                     fragments.append(("class:command", separator + remaining))
                 return fragments
             return [("class:default", text)]
+
 
         return get_line

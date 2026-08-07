@@ -58,3 +58,7 @@ class RecordStore:
         records.pop(index)
         self.replace(records)
         return True
+
+    def clear(self):
+        self.replace([])
+
